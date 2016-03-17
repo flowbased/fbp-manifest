@@ -112,7 +112,10 @@ getModuleInfo = (baseDir, options, callback) ->
     module.name = module.name.replace 'noflo-', ''
 
     Promise.resolve module
-  .nodeify callback
+  .nodeify (err, module) ->
+    return callback null, null if err and err.code is 'ENOENT'
+    return callback err if err
+    callback null, module
 
 exports.list = (baseDir, options, callback) ->
   listC = Promise.promisify listComponents
@@ -124,6 +127,7 @@ exports.list = (baseDir, options, callback) ->
     listG baseDir, options
   ]
   .then ([module, components, graphs]) ->
+    return Promise.resolve [] unless module
     runtimes = {}
     for c in components
       runtimes[c.runtime] = [] unless runtimes[c.runtime]
