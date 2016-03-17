@@ -29,9 +29,11 @@ exports.list = (baseDir, options, callback) ->
   .nodeify callback
 
 exports.main = main = ->
+  availableRuntimes = Object.keys runtimes
+  list = (val) -> val.split ','
   program = require 'commander'
   .option('--recursive', 'List also from dependencies')
-  .option('--runtimes <runtimes>', 'List of runtimes to list components for', (val) -> val.split(','))
+  .option('--runtimes <runtimes>', "List components from runtimes, including #{availableRuntimes.join(', ')}", list)
   .arguments '<basedir>'
   .parse process.argv
 
