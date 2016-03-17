@@ -54,3 +54,6 @@ exports.list = (baseDir, options, callback) ->
 
     Promise.resolve [module]
   .nodeify callback
+
+exports.listDependencies = (baseDir, options, callback) ->
+  return callback null, []

@@ -144,3 +144,14 @@ exports.list = (baseDir, options, callback) ->
         components: v
     Promise.resolve modules
   .nodeify callback
+
+exports.listDependencies = (baseDir, options, callback) ->
+  depsDir = path.resolve baseDir, 'node_modules/'
+  readdir depsDir
+  .then (deps) ->
+    deps = deps.filter (d) -> d[0] isnt '.'
+    Promise.resolve deps.map (d) -> path.resolve depsDir, d
+  .nodeify (err, deps) ->
+    return callback null, [] if err and err.code is 'ENOENT'
+    return callback err if err
+    callback null, deps

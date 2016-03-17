@@ -23,9 +23,22 @@ exports.list = (baseDir, options, callback) ->
     # Flatten
     modules = []
     modules = modules.concat r for r in results
-    Promise.resolve
-      version: 1
-      modules: modules
+    Promise.resolve modules unless options.recursive
+    Promise.map options.runtimes, (runtime) ->
+      depLister = Promise.promisify runtimes[runtime].listDependencies
+      depLister baseDir, options
+      .map (dep) ->
+        subLister = Promise.promisify runtimes[runtime].list
+        subLister dep, options
+      .then (subDeps) ->
+        subs = []
+        subs = subs.concat s for s in subDeps
+        Promise.resolve subs
+    .then (subDeps) ->
+      subs = []
+      subs = subs.concat s for s in subDeps
+      modules = modules.concat subs
+      Promise.resolve modules
   .nodeify callback
 
 exports.main = main = ->
@@ -40,9 +53,12 @@ exports.main = main = ->
   unless program.args.length
     program.args.push process.cwd()
 
-  exports.list program.args[0], program, (err, components) ->
+  exports.list program.args[0], program, (err, modules) ->
     if err
       console.log err
       process.exit 1
-    console.log JSON.stringify components, null, 2
+    manifest =
+      version: 1
+      modules: modules
+    console.log JSON.stringify manifest, null, 2
     process.exit 0
