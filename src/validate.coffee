@@ -35,7 +35,7 @@ exports.validateFile = (file, callback) ->
     return callback err if err
     exports.validateJSON manifest, callback
 
-exports.main = main = () ->
+exports.main = main = ->
   program = require 'commander'
   .arguments '<fbp.json>'
   .parse process.argv
