@@ -23,7 +23,7 @@ exports.list = (baseDir, options, callback) ->
     # Flatten
     modules = []
     modules = modules.concat r for r in results
-    Promise.resolve modules unless options.recursive
+    return Promise.resolve modules unless options.recursive
     Promise.map options.runtimes, (runtime) ->
       depLister = Promise.promisify runtimes[runtime].listDependencies
       depLister baseDir, options
