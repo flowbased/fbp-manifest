@@ -18,6 +18,13 @@ exports.list = (baseDir, options, callback) ->
   Promise.map options.runtimes, (runtime) ->
     lister = Promise.promisify runtimes[runtime].list
     lister baseDir, options
+  .then (results) ->
+    # Flatten
+    modules = []
+    modules = modules.concat r for r in results
+    Promise.resolve
+      version: 1
+      modules: modules
   .nodeify callback
 
 exports.main = main = ->
