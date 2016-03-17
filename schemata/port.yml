@@ -1,0 +1,34 @@
+---
+id: port.json
+"$schema": "http://json-schema.org/draft-04/schema"
+title: Port definition
+description: ""
+type:
+- object
+properties:
+  name:
+    name: name
+    type: string
+    description: Port name
+    example: in
+  description:
+    name: description
+    type: string
+    description: Longer textual description of the port
+    example: Input YAML to be converted
+  type:
+    name: type
+    type: string
+    description: Port datatype
+    example: string
+  addressable:
+    name: addressable
+    type: boolean
+    description: Whether the port is an addressable ArrayPort
+    example: false
+  required:
+    name: required
+    type: boolean
+    description: Whether the port needs to be connected for the component to work
+    example: false
+required: [name,type,addressable]

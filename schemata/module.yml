@@ -1,0 +1,41 @@
+---
+id: module.json
+"$schema": "http://json-schema.org/draft-04/schema"
+title: Module definition
+description: ""
+type:
+- object
+properties:
+  name:
+    name: name
+    type: string
+    description: Module name
+    example: 'yaml'
+  description:
+    name: description
+    type: string
+    description: Longer textual description of the module
+    example: YAML handling components for NoFlo
+  runtime:
+    name: runtime
+    type: string
+    description: FBP runtime the module is for
+    example: 'noflo-nodejs'
+  base:
+    name: base
+    type: string
+    description: Base path for the module relative to manifest location
+    example: 'node_modules/noflo-yaml'
+  icon:
+    name: icon
+    type: string
+    description: Default icon for module components based on Font Awesome naming scheme
+    example: 'bar-chart'
+  components:
+    name: components
+    description: Components provided by the module
+    minItems: 0
+    uniqueItems: true
+    items:
+      "$ref": "component.json"
+required: [name,runtime,base,components]

@@ -1,0 +1,55 @@
+---
+id: component.json
+"$schema": "http://json-schema.org/draft-04/schema"
+title: Component definition
+description: ""
+type:
+- object
+properties:
+  name:
+    name: name
+    type: string
+    description: Component name
+    example: ReadYaml
+  description:
+    name: description
+    type: string
+    description: Longer textual description of the component
+    example: Convert a YAML string into an object
+  path:
+    name: path
+    type: string
+    description: Path used for loading the component
+    example: "components/ReadYaml.js"
+  source:
+    name: source
+    type: string
+    description: Source code path for component, if available
+    example: "components/ReadYaml.coffee"
+  exec:
+    name: exec
+    type: string
+    description: Command for starting up the component
+    example: "noflo-nodejs --graph yaml/ReadYaml"
+  elementary:
+    name: elementary
+    type: boolean
+    description: "True for standalone, false for graphs"
+    example: false
+  inports:
+    name: inports
+    type: array
+    description: Definition of component inports
+    minItems: 0
+    uniqueItems: true
+    items:
+      "$ref": "port.json"
+  outports:
+    name: outports
+    type: array
+    description: Definition of component outports
+    minItems: 0
+    uniqueItems: true
+    items:
+      "$ref": "port.json"
+required: [name,path]

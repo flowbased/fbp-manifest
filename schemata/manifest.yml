@@ -1,0 +1,25 @@
+---
+id: manifest.json
+"$schema": "http://json-schema.org/draft-04/schema"
+title: Component manifest
+description: "Manifest for a Flow-Based Programming project"
+type:
+- object
+properties:
+  main:
+    name: main
+    type: object
+    description: Setup for the main graph of the project
+    "$ref": "component.json"
+  version:
+    name: version
+    type: number
+    description: Manifest version
+  modules:
+    description: Modules available
+    type: array
+    minItems: 0
+    uniqueItems: true
+    items:
+      "$ref": "module.json"
+required: [version,modules]

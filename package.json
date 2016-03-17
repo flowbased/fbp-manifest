@@ -1,0 +1,27 @@
+{
+  "name": "fbp-manifest",
+  "version": "0.1.0",
+  "description": "Flow-Based Programming Manifest tools",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/flowbased/fbp-manifest.git"
+  },
+  "author": "Henri Bergius <henri.bergius@iki.fi>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/flowbased/fbp-manifest/issues"
+  },
+  "homepage": "https://github.com/flowbased/fbp-manifest#readme",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-coffeelint": "0.0.15",
+    "grunt-mocha-test": "^0.12.7",
+    "grunt-yaml": "^0.4.2",
+    "grunt-yamllint": "^0.2.0",
+    "mocha": "^2.4.5"
+  }
+}
