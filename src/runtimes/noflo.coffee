@@ -150,7 +150,17 @@ exports.listDependencies = (baseDir, options, callback) ->
   readdir depsDir
   .then (deps) ->
     deps = deps.filter (d) -> d[0] isnt '.'
-    Promise.resolve deps.map (d) -> path.resolve depsDir, d
+    Promise.map deps, (d) ->
+      depsPath = path.resolve depsDir, d
+      unless d[0] is '@'
+        return Promise.resolve [depsPath]
+      readdir depsPath
+      .then (subDeps) ->
+        Promise.resolve subDeps.map (s) -> path.resolve depsPath, s
+    .then (depsPaths) ->
+      deps = []
+      deps = deps.concat d for d in depsPaths
+      Promise.resolve deps
   .nodeify (err, deps) ->
     return callback null, [] if err and err.code is 'ENOENT'
     return callback err if err
