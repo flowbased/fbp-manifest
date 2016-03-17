@@ -128,16 +128,18 @@ exports.list = (baseDir, options, callback) ->
     for c in components
       runtimes[c.runtime] = [] unless runtimes[c.runtime]
       runtimes[c.runtime].push c
+      delete c.runtime
     for c in graphs
       runtimes[c.runtime] = [] unless runtimes[c.runtime]
       runtimes[c.runtime].push c
+      delete c.runtime
     modules = []
     for k, v of runtimes
       modules.push
         name: module.name
         description: module.description
         runtime: k
-        base: baseDir
+        base: path.relative options.root, baseDir
         icon: module.icon
         components: v
     Promise.resolve modules
