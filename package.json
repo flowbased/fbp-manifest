@@ -15,6 +15,9 @@
   "bugs": {
     "url": "https://github.com/flowbased/fbp-manifest/issues"
   },
+  "bin": {
+    "fbp-manifest-validate": "./fbp-manifest-validate"
+  },
   "homepage": "https://github.com/flowbased/fbp-manifest#readme",
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -23,5 +26,11 @@
     "grunt-yaml": "^0.4.2",
     "grunt-yamllint": "^0.2.0",
     "mocha": "^2.4.5"
+  },
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "coffee-script": "^1.10.0",
+    "commander": "^2.9.0",
+    "tv4": "^1.2.7"
   }
 }
