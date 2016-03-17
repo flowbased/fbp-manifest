@@ -5,6 +5,7 @@ utils = require './utils'
 
 readdir = Promise.promisify fs.readdir
 readfile = Promise.promisify fs.readFile
+stat = Promise.promisify fs.stat
 
 supportedRuntimes = [
   'noflo'
@@ -21,20 +22,26 @@ listComponents = (baseDir, options, callback) ->
       '.js'
       '.litcoffee'
     ]
-    Promise.map potential, (p) ->
+    Promise.filter potential, (p) ->
       componentPath = path.resolve componentDir, p
-      component =
-        name: null
-        path: path.relative options.root, componentPath
-        source: path.relative options.root, componentPath
-        elementary: true
-      readfile componentPath, 'utf-8'
-      .then (source) ->
-        component.name = utils.parseId source, componentPath
-        component.runtime = utils.parsePlatform source
-        # Default to NoFlo on any platform
-        component.runtime = 'noflo' if component.runtime in ['all', null]
-        Promise.resolve component
+      stat componentPath
+      .then (stats) ->
+        stats.isFile()
+    .then (potential) ->
+      Promise.map potential, (p) ->
+        componentPath = path.resolve componentDir, p
+        component =
+          name: null
+          path: path.relative options.root, componentPath
+          source: path.relative options.root, componentPath
+          elementary: true
+        readfile componentPath, 'utf-8'
+        .then (source) ->
+          component.name = utils.parseId source, componentPath
+          component.runtime = utils.parsePlatform source
+          # Default to NoFlo on any platform
+          component.runtime = 'noflo' if component.runtime in ['all', null]
+          Promise.resolve component
   .then (components) ->
     Promise.resolve components.filter (c) ->
       c.runtime in supportedRuntimes
@@ -52,27 +59,33 @@ listGraphs = (baseDir, options, callback) ->
       '.json'
       '.fbp'
     ]
-    Promise.map potential, (p) ->
+    Promise.filter potential, (p) ->
       componentPath = path.resolve componentDir, p
-      component =
-        name: null
-        path: path.relative options.root, componentPath
-        source: path.relative options.root, componentPath
-        elementary: false
-      readfile componentPath, 'utf-8'
-      .then (source) ->
-        if path.extname(component.path) is '.fbp'
-          component.name = utils.parseId source, componentPath
-          component.runtime = utils.parsePlatform source
-          return Promise.resolve component
-        graph = JSON.parse source
-        component.name = graph.properties?.id or utils.parseId source, componentPath
-        component.runtime = graph.properties?.environment?.type or null
-        Promise.resolve component
-      .then (component) ->
-        # Default to NoFlo on any platform
-        component.runtime = 'noflo' if component.runtime in ['all', null]
-        Promise.resolve component
+      stat componentPath
+      .then (stats) ->
+        stats.isFile()
+    .then (potential) ->
+      Promise.map potential, (p) ->
+        componentPath = path.resolve componentDir, p
+        component =
+          name: null
+          path: path.relative options.root, componentPath
+          source: path.relative options.root, componentPath
+          elementary: false
+        readfile componentPath, 'utf-8'
+        .then (source) ->
+          if path.extname(component.path) is '.fbp'
+            component.name = utils.parseId source, componentPath
+            component.runtime = utils.parsePlatform source
+            return Promise.resolve component
+          graph = JSON.parse source
+          component.name = graph.properties?.id or utils.parseId source, componentPath
+          component.runtime = graph.properties?.environment?.type or null
+          Promise.resolve component
+        .then (component) ->
+          # Default to NoFlo on any platform
+          component.runtime = 'noflo' if component.runtime in ['all', null]
+          Promise.resolve component
   .then (components) ->
     Promise.resolve components.filter (c) ->
       c.runtime in supportedRuntimes
