@@ -34,5 +34,5 @@ exports.main = main = ->
     if err
       console.log err
       process.exit 1
-    console.log components
+    console.log JSON.stringify components, null, 2
     process.exit 0
