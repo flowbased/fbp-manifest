@@ -4,6 +4,7 @@ Promise = require 'bluebird'
 
 runtimes =
   noflo: require './runtimes/noflo'
+  msgflo: require './runtimes/msgflo'
 
 exports.list = (baseDir, options, callback) ->
   options.root = baseDir unless options.root
