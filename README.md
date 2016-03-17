@@ -12,6 +12,7 @@ Prototyping
 ## Tools
 
 * `fbp-manifest-validate`: Validate a FBP manifest file against the schema
+* `fbp-manifest-list`: Discover available components and list them
 
 ## Background
 
