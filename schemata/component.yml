@@ -52,4 +52,9 @@ properties:
     uniqueItems: true
     items:
       "$ref": "port.json"
-required: [name,path]
+required: [name]
+oneOf:
+-
+  required: [path]
+-
+  required: [exec]
