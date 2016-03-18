@@ -1,8 +1,8 @@
-lister = require './list'
+loader = require './load'
 
 countStats = (baseDir, options, callback) ->
   options.recursive = true
-  lister.list baseDir, options, (err, modules) ->
+  loader.load baseDir, options, (err, modules) ->
     return callback err if err
     local = 0
     deps = 0
