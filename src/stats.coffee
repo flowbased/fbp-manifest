@@ -19,6 +19,7 @@ exports.main = main = ->
   list = (val) -> val.split ','
   program = require 'commander'
   .option('--runtimes <runtimes>', "List components from runtimes", list)
+  .option('--manifest <manifest>', "Manifest file to use. Default is fbp.json", 'fbp.json')
   .arguments '<basedir>'
   .parse process.argv
 
