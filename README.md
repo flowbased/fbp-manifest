@@ -15,6 +15,15 @@ Prototyping
 * `fbp-manifest-stats`: Show component reuse statistics for a project
 * `fbp-manifest-validate`: Validate a FBP manifest file against the schema
 
+## Runtime support
+
+FBP Manifest has been designed to have a plugin architecture where the developers of different flow-based runtimes can add support for their system. See [src/runtimes](https://github.com/flowbased/fbp-manifest/tree/master/src/runtimes) for how to do this. Runtimes can of course also just implement `fbp.json` generation and consumption on their own, and merely utilize the JSON schemas from this project to validate their structure.
+
+Currently supported FBP runtimes are:
+
+* [NoFlo](http://noflojs.org)
+* [MsgFlo](https://github.com/msgflo/msgflo)
+
 ## Background
 
 * [FBP Protocol: component](http://noflojs.org/documentation/protocol/#component)
