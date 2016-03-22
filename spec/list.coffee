@@ -17,10 +17,14 @@ describe 'Listing components', ->
     , (err, modules) ->
       return done err if err
       chai.expect(modules.length).to.equal 2
-      common = modules.filter (m) -> m.runtime is 'noflo'
-      chai.expect(common.length).to.equal 1
-      chai.expect(common[0].components[0].name).to.equal 'Foo'
-      nodejs = modules.filter (m) -> m.runtime is 'noflo-nodejs'
-      chai.expect(nodejs.length).to.equal 1
-      chai.expect(nodejs[0].components[0].name).to.equal 'Bar'
+      [common] = modules.filter (m) -> m.runtime is 'noflo'
+      chai.expect(common).to.be.an 'object'
+      chai.expect(common.components[0].name).to.equal 'Foo'
+      [nodejs] = modules.filter (m) -> m.runtime is 'noflo-nodejs'
+      chai.expect(nodejs).to.be.an 'object'
+      chai.expect(nodejs.components.length).to.equal 2
+      chai.expect(nodejs.components[0].name).to.equal 'Bar'
+      chai.expect(nodejs.components[0].elementary).to.equal true
+      chai.expect(nodejs.components[1].name).to.equal 'Hello'
+      chai.expect(nodejs.components[1].elementary).to.equal false
       done()
