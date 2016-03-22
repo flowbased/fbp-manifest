@@ -2,11 +2,11 @@ loader = require './load'
 
 countStats = (baseDir, options, callback) ->
   options.recursive = true
-  loader.load baseDir, options, (err, modules) ->
+  loader.load baseDir, options, (err, manifest) ->
     return callback err if err
     local = 0
     deps = 0
-    for module in modules
+    for module in manifest.modules
       if module.base is ''
         local += module.components.length
         continue

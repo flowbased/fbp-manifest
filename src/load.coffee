@@ -10,7 +10,13 @@ exports.load = (baseDir, options, callback) ->
   fs.readFile manifestPath, 'utf-8', (err, contents) ->
     if err and err.code is 'ENOENT' and options.discover
       console.error "#{manifestPath} not found, running auto-discovery"
-      return lister.list baseDir, options, callback
+      lister.list baseDir, options, (err, modules) ->
+        return callback err if err
+        manifest =
+          version: 1
+          modules: modules
+        callback null, manifest
+      return
     return callback err if err
     try
       manifest = JSON.parse contents
