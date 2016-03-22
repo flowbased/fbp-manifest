@@ -25,9 +25,7 @@ exports.findComponent = (modules, component) ->
     continue unless m.components?.length
     for c in m.components
       if c.name is component or "#{m.name}/#{c.name}" is component
-        return found =
-          component: c
-          module: m
+        return c
   null
 
 exports.filterModules = (modules, components, callback) ->
@@ -58,14 +56,14 @@ exports.resolve = (modules, component, options, callback) ->
   unless componentFound
     return callback new Error "Component #{component} not available"
 
-  if componentFound.component.elementary
+  if componentFound.elementary
     callback null, [component]
     return
 
-  unless componentFound.component.source
+  unless componentFound.source
     return callback new Error "Graph source not available for #{component}"
 
-  graphPath = path.resolve options.baseDir, componentFound.component.source
+  graphPath = path.resolve options.baseDir, componentFound.source
   loadGraph graphPath, (err, graph) ->
     return callback err if err
     components = []
@@ -113,6 +111,7 @@ exports.main = main = ->
       console.log err
       process.exit 1
     manifest =
+      main: exports.findComponent dependedModules, program.args[1]
       version: 1
       modules: dependedModules
     console.log JSON.stringify manifest, null, 2
