@@ -89,9 +89,9 @@ exports.find = (modules, component, options, callback) ->
     exports.filterModules modules, components, callback
 
 exports.loadAndFind = (baseDir, component, options, callback) ->
-  loader.load baseDir, options, (err, modules) ->
+  loader.load baseDir, options, (err, manifest) ->
     return callback err if err
-    exports.find modules, component, options, callback
+    exports.find manifest.modules, component, options, callback
 
 exports.main = main = ->
   list = (val) -> val.split ','
@@ -108,7 +108,7 @@ exports.main = main = ->
   program.baseDir = program.args[0]
   exports.loadAndFind program.args[0], program.args[1], program, (err, dependedModules) ->
     if err
-      console.log err
+      console.error err
       process.exit 1
     manifest =
       main: exports.findComponent dependedModules, program.args[1]
