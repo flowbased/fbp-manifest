@@ -1,0 +1,7 @@
+{
+  "name": "noflo-deps",
+  "description": "NoFlo example with dependencies",
+  "dependencies": {
+    "noflo-dep": "1.0.0"
+  }
+}
