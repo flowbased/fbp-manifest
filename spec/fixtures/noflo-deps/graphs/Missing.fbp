@@ -3,4 +3,4 @@
 INPORT=Foo.IN:IN
 OUTPORT=Bar.OUT:OUT
 
-Foo(dep/Baz) OUT -> IN Foo2(dep/Foo) OUT -> IN Bar(deps/Bar)
+Foo(deps/Baz) OUT -> IN Bar(deps/Bar)

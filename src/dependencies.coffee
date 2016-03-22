@@ -2,6 +2,7 @@ clone = require 'clone'
 path = require 'path'
 fs = require 'fs'
 fbp = require 'fbp'
+Promise = require 'bluebird'
 
 loadGraph = (graphPath, callback) ->
   fs.readFile graphPath, 'utf-8', (err, content) ->
@@ -51,13 +52,13 @@ exports.filterModules = (modules, components, callback) ->
     return callback new Error "Missing components: #{components.join(', ')}"
   callback null, filtered
 
-exports.find = (modules, component, options, callback) ->
+exports.resolve = (modules, component, options, callback) ->
   componentFound = exports.findComponent modules, component
   unless componentFound
     return callback new Error "Component #{component} not available"
 
   if componentFound.component.elementary
-    exports.filterModules modules, [component], callback
+    callback null, [component]
     return
 
   unless componentFound.component.source
@@ -69,5 +70,21 @@ exports.find = (modules, component, options, callback) ->
     components = []
     for k, v of graph.processes
       components.push v.component
-    components.push component
+
+    resolver = Promise.promisify exports.resolve
+    Promise.map components, (c) ->
+      resolver modules, c, options
+    .nodeify (err, deps) ->
+      return callback err.cause if err?.cause
+      return callback err if err
+      subs = [component]
+      for s in deps
+        for sc in s
+          continue unless subs.indexOf(sc) is -1
+          subs.push sc
+      callback null, subs
+
+exports.find = (modules, component, options, callback) ->
+  exports.resolve modules, component, options, (err, components) ->
+    return callback err if err
     exports.filterModules modules, components, callback

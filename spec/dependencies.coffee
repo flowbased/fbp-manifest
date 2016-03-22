@@ -42,9 +42,8 @@ describe 'Finding component dependencies', ->
           chai.expect(dependedModules.length).to.equal 2
           dep1 = dependedModules[0]
           chai.expect(dep1.name).to.equal 'basic'
-          chai.expect(dep1.components.length).to.equal 2
-          chai.expect(dep1.components[0].name).to.equal 'Bar'
-          chai.expect(dep1.components[1].name).to.equal 'Hello'
+          names = dep1.components.map (d) -> d.name
+          chai.expect(names).to.contain 'Bar', 'Hello'
           dep2 = dependedModules[1]
           chai.expect(dep2.name).to.equal 'basic'
           chai.expect(dep2.components.length).to.equal 1
@@ -68,6 +67,7 @@ describe 'Finding component dependencies', ->
           baseDir: baseDir
         , (err, dependedModules) ->
           chai.expect(err).to.be.an 'error'
+          chai.expect(err.message).to.contain 'deps/Baz'
           done()
       it 'should only find the component itself', (done) ->
         manifest.dependencies.find modules, 'deps/Foo',
@@ -94,7 +94,14 @@ describe 'Finding component dependencies', ->
           chai.expect(dep.components[0].name).to.equal 'Foo'
           done()
     describe 'with component that is a graph', ->
-      it 'should find all dependencies', (done) ->
+      it 'should fail on missing dependencies', (done) ->
+        manifest.dependencies.find modules, 'deps/Missing',
+          baseDir: baseDir
+        , (err, dependedModules) ->
+          chai.expect(err).to.be.an 'error'
+          chai.expect(err.message).to.contain 'deps/Baz'
+          done()
+      it 'should find all dependencies, also from subgraph', (done) ->
         manifest.dependencies.find modules, 'deps/Hello',
           baseDir: baseDir
         , (err, dependedModules) ->
@@ -102,11 +109,10 @@ describe 'Finding component dependencies', ->
           chai.expect(dependedModules.length).to.equal 2
           dep = dependedModules[0]
           chai.expect(dep.name).to.equal 'deps'
-          chai.expect(dep.components.length).to.equal 2
-          chai.expect(dep.components[0].name).to.equal 'Bar'
-          chai.expect(dep.components[1].name).to.equal 'Hello'
+          names = dep.components.map (d) -> d.name
+          chai.expect(names).to.eql ['Bar', 'Hello']
           dep = dependedModules[1]
           chai.expect(dep.name).to.equal 'dep'
-          chai.expect(dep.components.length).to.equal 1
-          chai.expect(dep.components[0].name).to.equal 'Foo'
+          names = dep.components.map (d) -> d.name
+          chai.expect(names).to.eql ['Bar', 'Foo', 'Baz']
           done()
