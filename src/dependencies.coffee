@@ -28,19 +28,28 @@ exports.findComponent = (modules, component) ->
           module: m
   null
 
-exports.filterModules = (modules, components) ->
+exports.filterModules = (modules, components, callback) ->
   filtered = []
   for m in modules
     continue unless m.components?.length
     foundInModule = []
     for c in m.components
-      foundInModule.push c if c.name in components
-      foundInModule.push c if "#{m.name}/#{c.name}" in components
+      if c.name in components
+        foundInModule.push c
+        components.splice components.indexOf(c.name), 1
+        continue
+      if "#{m.name}/#{c.name}" in components
+        foundInModule.push c
+        components.splice components.indexOf("#{m.name}/#{c.name}"), 1
+        continue
     continue unless foundInModule.length
     newModule = clone m
     newModule.components = foundInModule
     filtered.push newModule
-  return filtered
+
+  if components.length
+    return callback new Error "Missing components: #{components.join(', ')}"
+  callback null, filtered
 
 exports.find = (modules, component, options, callback) ->
   componentFound = exports.findComponent modules, component
@@ -48,18 +57,17 @@ exports.find = (modules, component, options, callback) ->
     return callback new Error "Component #{component} not available"
 
   if componentFound.component.elementary
-    callback null, exports.filterModules modules, [component]
+    exports.filterModules modules, [component], callback
     return
 
   unless componentFound.component.source
     return callback new Error "Graph source not available for #{component}"
 
-  modulePath = path.resolve options.baseDir, componentFound.module.base
-  graphPath = path.resolve modulePath, componentFound.component.source
+  graphPath = path.resolve options.baseDir, componentFound.component.source
   loadGraph graphPath, (err, graph) ->
     return callback err if err
     components = []
     for k, v of graph.processes
       components.push v.component
     components.push component
-    callback null, exports.filterModules modules, components
+    exports.filterModules modules, components, callback
