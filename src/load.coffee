@@ -9,7 +9,7 @@ exports.load = (baseDir, options, callback) ->
   manifestPath = path.resolve baseDir, options.manifest
   fs.readFile manifestPath, 'utf-8', (err, contents) ->
     if err and err.code is 'ENOENT' and options.discover
-      console.log "#{manifestPath} not found, running auto-discovery"
+      console.error "#{manifestPath} not found, running auto-discovery"
       return lister.list baseDir, options, callback
     return callback err if err
     try
