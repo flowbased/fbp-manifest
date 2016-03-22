@@ -16,6 +16,7 @@
     "url": "https://github.com/flowbased/fbp-manifest/issues"
   },
   "bin": {
+    "fbp-manifest-deps": "./bin/fbp-manifest-deps",
     "fbp-manifest-list": "./bin/fbp-manifest-list",
     "fbp-manifest-stats": "./bin/fbp-manifest-stats",
     "fbp-manifest-validate": "./bin/fbp-manifest-validate"

@@ -3,6 +3,7 @@ path = require 'path'
 fs = require 'fs'
 fbp = require 'fbp'
 Promise = require 'bluebird'
+loader = require './load'
 
 loadGraph = (graphPath, callback) ->
   fs.readFile graphPath, 'utf-8', (err, content) ->
@@ -88,3 +89,31 @@ exports.find = (modules, component, options, callback) ->
   exports.resolve modules, component, options, (err, components) ->
     return callback err if err
     exports.filterModules modules, components, callback
+
+exports.loadAndFind = (baseDir, component, options, callback) ->
+  loader.load baseDir, options, (err, modules) ->
+    return callback err if err
+    exports.find modules, component, options, callback
+
+exports.main = main = ->
+  list = (val) -> val.split ','
+  program = require 'commander'
+  .option('--runtimes <runtimes>', "List components from runtimes", list)
+  .option('--manifest <manifest>', "Manifest file to use. Default is fbp.json", 'fbp.json')
+  .arguments '<basedir> <component>'
+  .parse process.argv
+
+  if program.args.length < 2
+    program.args.unshift process.cwd()
+
+  program.recursive = true
+  program.baseDir = program.args[0]
+  exports.loadAndFind program.args[0], program.args[1], program, (err, dependedModules) ->
+    if err
+      console.log err
+      process.exit 1
+    manifest =
+      version: 1
+      modules: dependedModules
+    console.log JSON.stringify manifest, null, 2
+    process.exit 0
