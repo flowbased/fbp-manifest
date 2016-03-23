@@ -67,7 +67,7 @@ It is possible to extend the manifest files with custom runtime-specific informa
   "name": "Merge",
   "path": "components/Merge.js",
   "source": "components/Merge.coffee",
-  "elementary": true,,
+  "elementary": true,
   "noflo": {
     "async": false
   }
