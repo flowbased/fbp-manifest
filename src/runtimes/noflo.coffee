@@ -147,6 +147,7 @@ exports.list = (baseDir, options, callback) ->
         name: module.name
         description: module.description
         runtime: k
+        noflo: module.noflo
         base: path.relative options.root, baseDir
         icon: module.icon
         components: v
