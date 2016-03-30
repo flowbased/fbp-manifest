@@ -107,6 +107,10 @@ getModuleInfo = (baseDir, options, callback) ->
     if packageData.noflo?.icon
       module.icon = packageData.noflo.icon
 
+    if packageData.noflo?.loader
+      module.noflo = {} unless module.noflo
+      module.noflo.loader = packageData.noflo.loader
+
     module.name = '' if module.name is 'noflo'
     module.name = module.name.replace /\@[a-z\-]+\//, '' if module.name[0] is '@'
     module.name = module.name.replace 'noflo-', ''
