@@ -37,11 +37,9 @@ exports.filterModules = (modules, components, callback) ->
       if c.name in components
         foundInModule.push c
         components.splice components.indexOf(c.name), 1
-        continue
       if "#{m.name}/#{c.name}" in components
         foundInModule.push c
         components.splice components.indexOf("#{m.name}/#{c.name}"), 1
-        continue
     continue unless foundInModule.length
     newModule = clone m
     newModule.components = foundInModule
