@@ -93,6 +93,18 @@ describe 'Finding component dependencies', ->
           chai.expect(dep.components.length).to.equal 1
           chai.expect(dep.components[0].name).to.equal 'Foo'
           done()
+      it 'should also find a component from a subdependency', (done) ->
+        manifest.dependencies.find modules, 'subdep/SubSubComponent',
+          baseDir: baseDir
+        , (err, dependedModules) ->
+          return done err if err
+          chai.expect(dependedModules.length).to.equal 1
+          dep = dependedModules[0]
+          chai.expect(dep.name).to.equal 'subdep'
+          chai.expect(dep.base).to.equal 'node_modules/noflo-dep/node_modules/noflo-subdep'
+          chai.expect(dep.components.length).to.equal 1
+          chai.expect(dep.components[0].name).to.equal 'SubSubComponent'
+          done()
     describe 'with component that is a graph', ->
       it 'should fail on missing dependencies', (done) ->
         manifest.dependencies.find modules, 'deps/Missing',
