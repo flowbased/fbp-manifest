@@ -13,8 +13,7 @@ supportedRuntimes = [
   'noflo-browser'
 ]
 
-listComponents = (baseDir, options, callback) ->
-  componentDir = path.resolve baseDir, 'components/'
+listComponents = (componentDir, options, callback) ->
   readdir componentDir
   .then (components) ->
     potential = components.filter (c) -> path.extname(c) in [
@@ -51,8 +50,7 @@ listComponents = (baseDir, options, callback) ->
     callback null, components
   null
 
-listGraphs = (baseDir, options, callback) ->
-  componentDir = path.resolve baseDir, 'graphs/'
+listGraphs = (componentDir, options, callback) ->
   readdir componentDir
   .then (components) ->
     potential = components.filter (c) -> path.extname(c) in [
@@ -127,8 +125,8 @@ exports.list = (baseDir, options, callback) ->
   getModule = Promise.promisify getModuleInfo
   Promise.all [
     getModule baseDir, options
-    listC baseDir, options
-    listG baseDir, options
+    listC path.resolve(baseDir, 'components/'), options
+    listG path.resolve(baseDir, 'graphs/'), options
   ]
   .then ([module, components, graphs]) ->
     return Promise.resolve [] unless module
