@@ -8,6 +8,7 @@ runtimes =
 
 exports.list = (baseDir, options, callback) ->
   options.root = baseDir unless options.root
+  options.subdirs = true if typeof options.subdirs is 'undefined'
 
   unless options.runtimes?.length
     return callback new Error "No runtimes specified"
@@ -45,7 +46,8 @@ exports.main = main = ->
   availableRuntimes = Object.keys runtimes
   list = (val) -> val.split ','
   program = require 'commander'
-  .option('--recursive', 'List also from dependencies')
+  .option('--recursive', 'List also from dependencies', true)
+  .option('--subdirs', 'List also from subdirectories of the primary component locations', true)
   .option('--runtimes <runtimes>', "List components from runtimes, including #{availableRuntimes.join(', ')}", list)
   .arguments '<basedir>'
   .parse process.argv

@@ -97,11 +97,11 @@ describe 'Finding component dependencies', ->
         , (err, dependedModules) ->
           return done err if err
           chai.expect(dependedModules.length).to.equal 2
-          dep1 = dependedModules[0]
+          dep1 = dependedModules[1]
           chai.expect(dep1.name).to.equal 'subdirs'
           names = dep1.components.map (d) -> d.name
           chai.expect(names).to.contain 'Bar', 'Hello'
-          dep2 = dependedModules[1]
+          dep2 = dependedModules[0]
           chai.expect(dep2.name).to.equal 'subdirs'
           chai.expect(dep2.components.length).to.equal 1
           chai.expect(dep2.components[0].name).to.equal 'Foo'
