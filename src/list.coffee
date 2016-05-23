@@ -28,7 +28,7 @@ exports.list = (baseDir, options, callback) ->
       depLister = Promise.promisify runtimes[runtime].listDependencies
       depLister baseDir, options
       .map (dep) ->
-        subLister = Promise.promisify runtimes[runtime].list
+        subLister = Promise.promisify exports.list
         subLister dep, options
       .then (subDeps) ->
         subs = []
