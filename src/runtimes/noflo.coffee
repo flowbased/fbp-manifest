@@ -82,6 +82,7 @@ listGraphs = (baseDir, options, callback) ->
           component.name = graph.properties?.id or utils.parseId source, componentPath
           component.runtime = graph.properties?.environment?.type or null
           if graph.properties?.main
+            component.noflo = {} unless component.noflo
             component.noflo.main = graph.properties.main
           Promise.resolve component
         .then (component) ->
@@ -91,7 +92,7 @@ listGraphs = (baseDir, options, callback) ->
   .then (components) ->
     Promise.resolve components.filter (c) ->
       # Don't register "main" graphs as modules
-      return false if c.noflo.main
+      return false if c.noflo?.main
       # Skip non-supported runtimes
       c.runtime in supportedRuntimes
   .nodeify (err, components) ->
