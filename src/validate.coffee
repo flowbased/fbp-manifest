@@ -52,4 +52,3 @@ exports.main = main = ->
     console.log "#{fileName} is valid FBP Manifest"
     process.exit 0
 
-main() if not module.parent
