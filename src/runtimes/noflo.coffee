@@ -147,6 +147,7 @@ exports.list = (baseDir, options, callback) ->
       runtimes[c.runtime] = [] unless runtimes[c.runtime]
       runtimes[c.runtime].push c
       delete c.runtime
+
     modules = []
     for k, v of runtimes
       modules.push
@@ -157,6 +158,18 @@ exports.list = (baseDir, options, callback) ->
         base: path.relative options.root, baseDir
         icon: module.icon
         components: v
+
+    if graphs.length is 0 and components.length is 0 and module.noflo?.loader
+      # Component that only provides a custom loader, register for "noflo"
+      modules.push
+        name: module.name
+        description: module.description
+        runtime: 'noflo'
+        noflo: module.noflo
+        base: path.relative options.root, baseDir
+        icon: module.icon
+        components: []
+
     Promise.resolve modules
   .nodeify callback
 
