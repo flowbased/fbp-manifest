@@ -13,11 +13,10 @@ supportedRuntimes = [
   'noflo-browser'
 ]
 
-listComponents = (baseDir, options, callback) ->
-  componentDir = path.resolve baseDir, 'components/'
+listComponents = (componentDir, options, callback) ->
   readdir componentDir
-  .then (components) ->
-    potential = components.filter (c) -> path.extname(c) in [
+  .then (entries) ->
+    potential = entries.filter (c) -> path.extname(c) in [
       '.coffee'
       '.js'
       '.litcoffee'
@@ -42,6 +41,25 @@ listComponents = (baseDir, options, callback) ->
           # Default to NoFlo on any platform
           component.runtime = 'noflo' if component.runtime in ['all', null]
           Promise.resolve component
+    .then (components) ->
+      potentialDirs = entries.filter (entry) -> entry not in potential
+      return Promise.resolve components unless potentialDirs.length
+      return Promise.resolve components unless options.subdirs
+      # Seek from subdirectories
+      Promise.filter potentialDirs, (d) ->
+        dirPath = path.resolve componentDir, d
+        stat dirPath
+        .then (stats) ->
+          stats.isDirectory()
+      .then (directories) ->
+        Promise.map directories, (d) ->
+          dirPath = path.resolve componentDir, d
+          listComponents = Promise.promisify listComponents
+          listComponents dirPath, options
+      .then (subDirs) ->
+        for subComponents in subDirs
+          components = components.concat subComponents
+        Promise.resolve components
   .then (components) ->
     Promise.resolve components.filter (c) ->
       c.runtime in supportedRuntimes
@@ -51,8 +69,7 @@ listComponents = (baseDir, options, callback) ->
     callback null, components
   null
 
-listGraphs = (baseDir, options, callback) ->
-  componentDir = path.resolve baseDir, 'graphs/'
+listGraphs = (componentDir, options, callback) ->
   readdir componentDir
   .then (components) ->
     potential = components.filter (c) -> path.extname(c) in [
@@ -133,8 +150,8 @@ exports.list = (baseDir, options, callback) ->
   getModule = Promise.promisify getModuleInfo
   Promise.all [
     getModule baseDir, options
-    listC baseDir, options
-    listG baseDir, options
+    listC path.resolve(baseDir, 'components/'), options
+    listG path.resolve(baseDir, 'graphs/'), options
   ]
   .then ([module, components, graphs]) ->
     return Promise.resolve [] unless module
