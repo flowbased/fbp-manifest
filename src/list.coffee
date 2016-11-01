@@ -41,6 +41,7 @@ exports.list = (baseDir, options, callback) ->
       modules = modules.concat subs
       Promise.resolve modules
   .nodeify callback
+  return
 
 exports.main = main = ->
   availableRuntimes = Object.keys runtimes
