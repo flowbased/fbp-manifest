@@ -22,25 +22,42 @@ loadGraph = (graphPath, callback) ->
 
 exports.findComponent = (modules, component) ->
   for m in modules
-    continue unless m.components?.length
     for c in m.components
       if c.name is component or "#{m.name}/#{c.name}" is component
         return c
   null
 
+exports.checkCustomLoaderInModules = (modules, component) ->
+  for m in modules
+    return true if exports.checkCustomLoader m, component
+    continue
+  return false
+
+exports.checkCustomLoader = (module, component) ->
+  return false unless module.noflo?.loader
+  componentModule = component.split('/')[0]
+  return false unless componentModule is module.name
+  return true
+
 exports.filterModules = (modules, components, callback) ->
   filtered = []
   for m in modules
-    continue unless m.components?.length
     foundInModule = []
+    foundInLoader = false
     for c in m.components
       if c.name in components
         foundInModule.push c
         components.splice components.indexOf(c.name), 1
+        continue
       if "#{m.name}/#{c.name}" in components
         foundInModule.push c
         components.splice components.indexOf("#{m.name}/#{c.name}"), 1
-    continue unless foundInModule.length
+        continue
+    for c in components
+      continue unless exports.checkCustomLoader m, c
+      components.splice components.indexOf(c.name), 1
+      foundInLoader = true
+    continue if not foundInModule.length and not foundInLoader
     newModule = clone m
     newModule.components = foundInModule
     filtered.push newModule
@@ -52,6 +69,10 @@ exports.filterModules = (modules, components, callback) ->
 exports.resolve = (modules, component, options, callback) ->
   componentFound = exports.findComponent modules, component
   unless componentFound
+    # Check if the dependended module registers a custom loader
+    customLoader = exports.checkCustomLoaderInModules modules, component
+    return callback null, [component] if customLoader
+    # Otherwise we fail with missing dependency
     return callback new Error "Component #{component} not available"
 
   if componentFound.elementary
