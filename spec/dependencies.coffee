@@ -185,3 +185,14 @@ describe 'Finding component dependencies', ->
           names = dep.components.map (d) -> d.name
           chai.expect(names).to.eql ['Bar', 'Foo', 'Baz']
           done()
+    describe 'with a graph that depends on components from a dynamic component loader', ->
+      it 'should find the dependencies and register the loader', (done) ->
+        manifest.dependencies.find modules, 'deps/WithLoader',
+          baseDir: baseDir
+        , (err, dependedModules) ->
+          return done err if err
+          chai.expect(dependedModules.length).to.equal 3
+          [withLoader] = dependedModules.filter (m) -> m.name is 'loader'
+          chai.expect(withLoader.noflo.loader).to.equal 'lib/ComponentLoader'
+          chai.expect(withLoader.components).to.eql []
+          done()
