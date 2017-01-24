@@ -1,6 +1,6 @@
 # @runtime noflo-nodejs
 
 INPORT=Foo.IN:IN
-OUTPORT=Bar.OUT:OUT
+OUTPORT=Bar2.OUT:OUT
 
-Foo(dep/Baz) OUT -> IN Foo2(dep/Foo) OUT -> IN Bar(deps/Bar)
+Foo(dep/Baz) OUT -> IN Foo2(dep/Foo) OUT -> IN Bar(deps/Bar) OUT -> IN Bar2(Bar)
