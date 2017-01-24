@@ -34,6 +34,7 @@ exports.checkCustomLoaderInModules = (modules, component) ->
   return false
 
 exports.checkCustomLoader = (module, component) ->
+  return false unless component
   return false unless module.noflo?.loader
   componentModule = component.split('/')[0]
   return false unless componentModule is module.name
@@ -41,26 +42,32 @@ exports.checkCustomLoader = (module, component) ->
 
 exports.filterModules = (modules, components, callback) ->
   filtered = []
+  componentsFound = []
   for m in modules
     foundInModule = []
     foundInLoader = false
     for c in m.components
+      continue unless c
       if c.name in components
         foundInModule.push c
-        components.splice components.indexOf(c.name), 1
+        componentsFound.push c.name
         continue
       if "#{m.name}/#{c.name}" in components
         foundInModule.push c
-        components.splice components.indexOf("#{m.name}/#{c.name}"), 1
+        componentsFound.push "#{m.name}/#{c.name}"
         continue
     for c in components
+      continue unless c
       continue unless exports.checkCustomLoader m, c
-      components.splice components.indexOf(c.name), 1
+      componentsFound.push c
       foundInLoader = true
     continue if not foundInModule.length and not foundInLoader
     newModule = clone m
     newModule.components = foundInModule
     filtered.push newModule
+
+  components = components.filter (c) ->
+    componentsFound.indexOf(c) is -1
 
   if components.length
     return callback new Error "Missing components: #{components.join(', ')}"
@@ -87,6 +94,7 @@ exports.resolve = (modules, component, options, callback) ->
     return callback err if err
     components = []
     for k, v of graph.processes
+      continue unless v.component
       components.push v.component
 
     resolver = Promise.promisify exports.resolve
