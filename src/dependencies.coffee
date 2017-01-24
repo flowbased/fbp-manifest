@@ -41,37 +41,39 @@ exports.checkCustomLoader = (module, component) ->
   return true
 
 exports.filterModules = (modules, components, callback) ->
-  filtered = []
   componentsFound = []
-  for m in modules
-    foundInModule = []
-    foundInLoader = false
-    for c in m.components
-      continue unless c
+  filteredModules = []
+
+  modules.forEach (m) ->
+    # Filter components list to only the ones used in graph(s)
+    foundComponents = m.components.filter (c) ->
+      return false unless c
+      foundAsDependency = false
       if c.name in components
-        foundInModule.push c
         componentsFound.push c.name
-        continue
+        foundAsDependency = true
       if "#{m.name}/#{c.name}" in components
-        foundInModule.push c
         componentsFound.push "#{m.name}/#{c.name}"
-        continue
-    for c in components
-      continue unless c
-      continue unless exports.checkCustomLoader m, c
-      componentsFound.push c
-      foundInLoader = true
-    continue if not foundInModule.length and not foundInLoader
+        foundAsDependency = true
+      return foundAsDependency
+    # Check if graph(s) depend on dynamically loaded components
+    customLoaderComponents = components.filter (c) ->
+      return false unless c
+      if exports.checkCustomLoader m, c
+        return true
+      return false
+    componentsFound = componentsFound.concat customLoaderComponents
+    return if not foundComponents.length and not customLoaderComponents.length
     newModule = clone m
-    newModule.components = foundInModule
-    filtered.push newModule
+    newModule.components = foundComponents
+    filteredModules.push newModule
 
   components = components.filter (c) ->
     componentsFound.indexOf(c) is -1
 
   if components.length
     return callback new Error "Missing components: #{components.join(', ')}"
-  callback null, filtered
+  callback null, filteredModules
 
 exports.resolve = (modules, component, options, callback) ->
   componentFound = exports.findComponent modules, component
