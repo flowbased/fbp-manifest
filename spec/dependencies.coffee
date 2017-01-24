@@ -146,7 +146,7 @@ describe 'Finding component dependencies', ->
           chai.expect(dependedModules.length).to.equal 1
           dep = dependedModules[0]
           chai.expect(dep.name).to.equal 'dep'
-          chai.expect(dep.base).to.equal 'node_modules/noflo-dep'
+          chai.expect(dep.base).to.equal path.normalize 'node_modules/noflo-dep'
           chai.expect(dep.components.length).to.equal 1
           chai.expect(dep.components[0].name).to.equal 'Foo'
           done()
@@ -158,7 +158,7 @@ describe 'Finding component dependencies', ->
           chai.expect(dependedModules.length).to.equal 1
           dep = dependedModules[0]
           chai.expect(dep.name).to.equal 'subdep'
-          chai.expect(dep.base).to.equal 'node_modules/noflo-dep/node_modules/noflo-subdep'
+          chai.expect(dep.base).to.equal path.normalize 'node_modules/noflo-dep/node_modules/noflo-subdep'
           chai.expect(dep.components.length).to.equal 1
           chai.expect(dep.components[0].name).to.equal 'SubSubComponent'
           done()
