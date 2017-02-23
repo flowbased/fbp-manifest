@@ -24,7 +24,7 @@
   "homepage": "https://github.com/flowbased/fbp-manifest#readme",
   "devDependencies": {
     "chai": "^3.5.0",
-    "grunt": "^0.4.5",
+    "grunt": "^1.0.1",
     "grunt-coffeelint": "^0.0.16",
     "grunt-mocha-test": "^0.13.2",
     "grunt-yaml": "^0.4.2",
