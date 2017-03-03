@@ -1,6 +1,6 @@
 {
   "name": "fbp-manifest",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "Flow-Based Programming Manifest tools",
   "main": "index.js",
   "scripts": {
