@@ -121,8 +121,16 @@ listGraphs = (componentDir, options, callback) ->
 getModuleInfo = (baseDir, options, callback) ->
   packageFile = path.resolve baseDir, 'package.json'
   readfile packageFile, 'utf-8'
+  .catch (e) ->
+    return Promise.reject e unless e?.code is 'ENOENT'
+    # Fake package with just dirname
+    Promise.resolve
+      name: path.basename baseDir
+      description: null
   .then (json) ->
-    packageData = JSON.parse json
+    return Promise.resolve json if typeof json is 'object'
+    Promise.resolve JSON.parse json
+  .then (packageData) ->
     module =
       name: packageData.name
       description: packageData.description
