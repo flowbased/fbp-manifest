@@ -1,6 +1,8 @@
 Flow-Based Programming Manifest Tools
 =====================================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/flowbased/fbp-manifest.svg)](https://greenkeeper.io/)
+
 This repository provides a schema for Flow-Based Programming manifest (`fbp.json`) files, as well as tools for populating and validating them. The purpose of FBP manifest files is to provide a platform-agnostic registry of flow-based components available in a project.
 
 Manifest files can be used by the FBP runtimes themselves for component loading, and is also useful for development tools like [Flowhub](https://flowhub.io) or [DrawFBP](https://github.com/jpaulm/drawfbp).
