@@ -25,7 +25,7 @@
   "devDependencies": {
     "chai": "^4.0.1",
     "grunt": "^1.0.1",
-    "grunt-coffeelint": "^0.0.16",
+    "grunt-eslint": "^20.1.0",
     "grunt-mocha-test": "^0.13.2",
     "grunt-yaml": "^0.4.2",
     "grunt-yamllint": "^0.3.0",
@@ -34,7 +34,6 @@
   "dependencies": {
     "bluebird": "^3.3.4",
     "clone": "^2.0.0",
-    "coffee-script": "^1.10.0",
     "commander": "^2.9.0",
     "fbp": "~1.5.0",
     "tv4": "^1.2.7"

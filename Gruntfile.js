@@ -8,6 +8,10 @@ module.exports = function() {
   this.initConfig({
     pkg: this.file.readJSON('package.json'),
 
+    eslint: {
+      target: ['*.js', 'src/*.js', 'src/**/*.js'],
+    },
+
     yaml: {
       schemas: {
         files: [{
@@ -25,25 +29,11 @@ module.exports = function() {
       schemas: ['schemata/*.yml']
     },
 
-    coffeelint: {
-      components: [
-        'src/*.coffee',
-        'spec/*.coffee',
-        'Gruntfile.coffee'
-      ],
-      options: {
-        'max_line_length': {
-          'level': 'ignore'
-        }
-      }
-    },
-
     mochaTest: {
       nodejs: {
-        src: ['spec/*.coffee'],
+        src: ['spec/*.js'],
         options: {
           reporter: 'spec',
-          require: 'coffee-script/register'
         }
       }
     }
@@ -53,8 +43,8 @@ module.exports = function() {
   this.loadNpmTasks('grunt-yaml');
 
   // Grunt plugins used for testing
+  this.loadNpmTasks('grunt-eslint');
   this.loadNpmTasks('grunt-yamllint');
-  this.loadNpmTasks('grunt-coffeelint');
   this.loadNpmTasks('grunt-mocha-test');
 
   // Our local tasks
@@ -65,7 +55,7 @@ module.exports = function() {
 
   this.registerTask('test', 'Build and run tests', target => {
     if (target == null) { target = 'all'; }
-    this.task.run('coffeelint');
+    this.task.run('eslint');
     this.task.run('yamllint');
     return this.task.run('mochaTest');
   });
