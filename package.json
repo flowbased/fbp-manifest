@@ -24,6 +24,11 @@
   "homepage": "https://github.com/flowbased/fbp-manifest#readme",
   "devDependencies": {
     "chai": "^4.0.1",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
     "grunt": "^1.0.1",
     "grunt-eslint": "^20.1.0",
     "grunt-mocha-test": "^0.13.2",
