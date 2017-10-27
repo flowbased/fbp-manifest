@@ -1,29 +1,26 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
+/* eslint-disable
+    no-undef,
+*/
 const chai = require('chai');
 const manifest = require('../index.js');
 const path = require('path');
 
-describe('Listing components', function() {
-  it('should fail without provided runtimes', function(done) {
+describe('Listing components', function () {
+  it('should fail without provided runtimes', function (done) {
     const baseDir = path.resolve(__dirname, 'fixtures/noflo-basic');
-    return manifest.list.list(baseDir, {}, function(err, components) {
+    return manifest.list.list(baseDir, {}, function (err, components) {
       chai.expect(err).to.be.an('error');
       return done();
     });
   });
 
-  return it('should find NoFlo components', function(done) {
+  return it('should find NoFlo components', function (done) {
     const baseDir = path.resolve(__dirname, 'fixtures/noflo-basic');
     return manifest.list.list(baseDir, {
       runtimes: ['noflo'],
       recursive: true
     }
-    , function(err, modules) {
+      , function (err, modules) {
       if (err) { return done(err); }
       chai.expect(modules.length).to.equal(2);
       const [common] = Array.from(modules.filter(m => m.runtime === 'noflo'));

@@ -7,16 +7,16 @@ const path = require('path');
 const fs = require('fs');
 const lister = require('./list');
 
-exports.load = function(baseDir, options, callback) {
+exports.load = function (baseDir, options, callback) {
   if (typeof options.discover === 'undefined') { options.discover = true; }
   if (!options.manifest) { options.manifest = 'fbp.json'; }
 
   const manifestPath = path.resolve(baseDir, options.manifest);
-  return fs.readFile(manifestPath, 'utf-8', function(err, contents) {
+  return fs.readFile(manifestPath, 'utf-8', function (err, contents) {
     let manifest;
     if (err && (err.code === 'ENOENT') && options.discover) {
       if (!options.silent) { console.warn(`${manifestPath} not found, running auto-discovery`); }
-      lister.list(baseDir, options, function(err, modules) {
+      lister.list(baseDir, options, function (err, modules) {
         if (err) { return callback(err); }
         const manifest = {
           version: 1,

@@ -10,12 +10,12 @@ const Promise = require('bluebird');
 
 const readfile = Promise.promisify(fs.readFile);
 
-const replaceMarker = function(str, marker, value) {
+const replaceMarker = function (str, marker, value) {
   marker = `#${marker.toUpperCase()}`;
   return str.replace(marker, value);
 };
 
-const replaceVariables = function(str, variables) {
+const replaceVariables = function (str, variables) {
   for (let marker in variables) {
     const value = variables[marker];
     str = replaceMarker(str, marker, value);
@@ -23,7 +23,7 @@ const replaceVariables = function(str, variables) {
   return str;
 };
 
-const componentsFromConfig = function(config) {
+const componentsFromConfig = function (config) {
   const variables = config.variables || {};
   if (!config.components) { config.components = {}; }
 
@@ -40,39 +40,40 @@ const componentsFromConfig = function(config) {
   return components;
 };
 
-exports.list = function(baseDir, options, callback) {
+exports.list = function (baseDir, options, callback) {
   const packageFile = path.resolve(baseDir, 'package.json');
   return readfile(packageFile, 'utf-8')
-  .then(function(json) {
-    const packageData = JSON.parse(json);
-    if (!packageData.msgflo) { return Promise.resolve([]); }
+    .then(function (json) {
+      const packageData = JSON.parse(json);
+      if (!packageData.msgflo) { return Promise.resolve([]); }
 
-    const module = {
-      name: packageData.name,
-      description: packageData.description,
-      runtime: 'msgflo',
-      base: path.relative(options.root, baseDir),
-      components: []
-    };
+      const module = {
+        name: packageData.name,
+        description: packageData.description,
+        runtime: 'msgflo',
+        base: path.relative(options.root, baseDir),
+        components: []
+      };
 
-    if (packageData.msgflo != null ? packageData.msgflo.icon : undefined) {
-      module.icon = packageData.msgflo.icon;
-    }
+      if (packageData.msgflo != null ? packageData.msgflo.icon : undefined) {
+        module.icon = packageData.msgflo.icon;
+      }
 
-    const object = componentsFromConfig(packageData.msgflo);
-    for (let name in object) {
-      const definition = object[name];
-      let componentName = name.split('/')[1];
-      if (!componentName) { componentName = name; }
-      module.components.push({
-        name: componentName,
-        exec: definition,
-        elementary: false
-      });
-    }
+      const object = componentsFromConfig(packageData.msgflo);
+      for (let name in object) {
+        const definition = object[name];
+        let componentName = name.split('/')[1];
+        if (!componentName) { componentName = name; }
+        module.components.push({
+          name: componentName,
+          exec: definition,
+          elementary: false
+        });
+      }
 
-    return Promise.resolve([module]);})
-  .nodeify(callback);
+      return Promise.resolve([module]);
+    })
+    .nodeify(callback);
 };
 
 exports.listDependencies = (baseDir, options, callback) => callback(null, []);

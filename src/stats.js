@@ -1,3 +1,8 @@
+/* eslint-disable
+    no-unused-vars,
+*/
+// TODO: This file was updated by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -7,9 +12,9 @@
 let main;
 const loader = require('./load');
 
-const countStats = function(baseDir, options, callback) {
+const countStats = function (baseDir, options, callback) {
   options.recursive = true;
-  return loader.load(baseDir, options, function(err, manifest) {
+  return loader.load(baseDir, options, function (err, manifest) {
     if (err) { return callback(err); }
     let local = 0;
     let deps = 0;
@@ -28,19 +33,19 @@ const countStats = function(baseDir, options, callback) {
   });
 };
 
-exports.main = (main = function() {
+exports.main = (main = function () {
   const list = val => val.split(',');
   const program = require('commander')
-  .option('--runtimes <runtimes>', "List components from runtimes", list)
-  .option('--manifest <manifest>', "Manifest file to use. Default is fbp.json", 'fbp.json')
-  .arguments('<basedir>')
-  .parse(process.argv);
+    .option('--runtimes <runtimes>', 'List components from runtimes', list)
+    .option('--manifest <manifest>', 'Manifest file to use. Default is fbp.json', 'fbp.json')
+    .arguments('<basedir>')
+    .parse(process.argv);
 
   if (!program.args.length) {
     program.args.push(process.cwd());
   }
 
-  return countStats(program.args[0], program, function(err, stats) {
+  return countStats(program.args[0], program, function (err, stats) {
     let reuse;
     if (err) {
       console.log(err);

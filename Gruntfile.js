@@ -4,12 +4,12 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-module.exports = function() {
+module.exports = function () {
   this.initConfig({
     pkg: this.file.readJSON('package.json'),
 
     eslint: {
-      target: ['*.js', 'src/*.js', 'src/**/*.js'],
+      target: ['*.js', 'src/*.js', 'src/**/*.js']
     },
 
     yaml: {
@@ -33,7 +33,7 @@ module.exports = function() {
       nodejs: {
         src: ['spec/*.js'],
         options: {
-          reporter: 'spec',
+          reporter: 'spec'
         }
       }
     }
@@ -62,4 +62,3 @@ module.exports = function() {
 
   return this.registerTask('default', ['test']);
 };
-

@@ -1,3 +1,8 @@
+/* eslint-disable
+    no-unused-vars,
+*/
+// TODO: This file was updated by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -14,7 +19,7 @@ const Promise = require('bluebird');
 const loader = require('./load');
 
 const loadGraph = (graphPath, callback) =>
-  fs.readFile(graphPath, 'utf-8', function(err, content) {
+  fs.readFile(graphPath, 'utf-8', function (err, content) {
     let e, graph;
     if (err) { return callback(err); }
     if (path.extname(graphPath) === '.fbp') {
@@ -36,7 +41,7 @@ const loadGraph = (graphPath, callback) =>
   })
 ;
 
-exports.findComponent = function(modules, component) {
+exports.findComponent = function (modules, component) {
   for (let m of Array.from(modules)) {
     for (let c of Array.from(m.components)) {
       if ((c.name === component) || (`${m.name}/${c.name}` === component)) {
@@ -47,7 +52,7 @@ exports.findComponent = function(modules, component) {
   return null;
 };
 
-exports.checkCustomLoaderInModules = function(modules, component) {
+exports.checkCustomLoaderInModules = function (modules, component) {
   for (let m of Array.from(modules)) {
     if (exports.checkCustomLoader(m, component)) { return true; }
     continue;
@@ -55,7 +60,7 @@ exports.checkCustomLoaderInModules = function(modules, component) {
   return false;
 };
 
-exports.checkCustomLoader = function(module, component) {
+exports.checkCustomLoader = function (module, component) {
   if (!component) { return false; }
   if (!(module.noflo != null ? module.noflo.loader : undefined)) { return false; }
   const componentModule = component.split('/')[0];
@@ -63,13 +68,13 @@ exports.checkCustomLoader = function(module, component) {
   return true;
 };
 
-exports.filterModules = function(modules, components, callback) {
+exports.filterModules = function (modules, components, callback) {
   let componentsFound = [];
   const filteredModules = [];
 
-  modules.forEach(function(m) {
+  modules.forEach(function (m) {
     // Filter components list to only the ones used in graph(s)
-    const foundComponents = m.components.filter(function(c) {
+    const foundComponents = m.components.filter(function (c) {
       if (!c) { return false; }
       let foundAsDependency = false;
       if (Array.from(components).includes(c.name)) {
@@ -83,7 +88,7 @@ exports.filterModules = function(modules, components, callback) {
       return foundAsDependency;
     });
     // Check if graph(s) depend on dynamically loaded components
-    const customLoaderComponents = components.filter(function(c) {
+    const customLoaderComponents = components.filter(function (c) {
       if (!c) { return false; }
       if (exports.checkCustomLoader(m, c)) {
         return true;
@@ -105,7 +110,7 @@ exports.filterModules = function(modules, components, callback) {
   return callback(null, filteredModules);
 };
 
-exports.resolve = function(modules, component, options, callback) {
+exports.resolve = function (modules, component, options, callback) {
   const componentFound = exports.findComponent(modules, component);
   if (!componentFound) {
     // Check if the dependended module registers a custom loader
@@ -125,7 +130,7 @@ exports.resolve = function(modules, component, options, callback) {
   }
 
   const graphPath = path.resolve(options.baseDir, componentFound.source);
-  return loadGraph(graphPath, function(err, graph) {
+  return loadGraph(graphPath, function (err, graph) {
     if (err) { return callback(err); }
     const components = [];
     for (let k in graph.processes) {
@@ -135,7 +140,7 @@ exports.resolve = function(modules, component, options, callback) {
     }
 
     const resolver = Promise.promisify(exports.resolve);
-    return Promise.map(components, c => resolver(modules, c, options)).nodeify(function(err, deps) {
+    return Promise.map(components, c => resolver(modules, c, options)).nodeify(function (err, deps) {
       if (err != null ? err.cause : undefined) { return callback(err.cause); }
       if (err) { return callback(err); }
       const subs = [component];
@@ -151,26 +156,26 @@ exports.resolve = function(modules, component, options, callback) {
 };
 
 exports.find = (modules, component, options, callback) =>
-  exports.resolve(modules, component, options, function(err, components) {
+  exports.resolve(modules, component, options, function (err, components) {
     if (err) { return callback(err); }
     return exports.filterModules(modules, components, callback);
   })
 ;
 
 exports.loadAndFind = (baseDir, component, options, callback) =>
-  loader.load(baseDir, options, function(err, manifest) {
+  loader.load(baseDir, options, function (err, manifest) {
     if (err) { return callback(err); }
     return exports.find(manifest.modules, component, options, callback);
   })
 ;
 
-exports.main = (main = function() {
+exports.main = (main = function () {
   const list = val => val.split(',');
   const program = require('commander')
-  .option('--runtimes <runtimes>', "List components from runtimes", list)
-  .option('--manifest <manifest>', "Manifest file to use. Default is fbp.json", 'fbp.json')
-  .arguments('<basedir> <component>')
-  .parse(process.argv);
+    .option('--runtimes <runtimes>', 'List components from runtimes', list)
+    .option('--manifest <manifest>', 'Manifest file to use. Default is fbp.json', 'fbp.json')
+    .arguments('<basedir> <component>')
+    .parse(process.argv);
 
   if (program.args.length < 2) {
     program.args.unshift(process.cwd());
@@ -178,7 +183,7 @@ exports.main = (main = function() {
 
   program.recursive = true;
   program.baseDir = program.args[0];
-  return exports.loadAndFind(program.args[0], program.args[1], program, function(err, dependedModules) {
+  return exports.loadAndFind(program.args[0], program.args[1], program, function (err, dependedModules) {
     if (err) {
       console.error(err);
       process.exit(1);
