@@ -1,11 +1,18 @@
-path = require 'path'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const path = require('path');
 
-exports.parseId = (source, filepath) ->
-  id = source.match /@name ([A-Za-z0-9]+)/
-  return id[1] if id
-  path.basename filepath, path.extname filepath
+exports.parseId = function(source, filepath) {
+  const id = source.match(/@name ([A-Za-z0-9]+)/);
+  if (id) { return id[1]; }
+  return path.basename(filepath, path.extname(filepath));
+};
 
-exports.parsePlatform = (source) ->
-  runtimeType = source.match /@runtime ([a-z\-]+)/
-  return runtimeType[1] if runtimeType
-  null
+exports.parsePlatform = function(source) {
+  const runtimeType = source.match(/@runtime ([a-z\-]+)/);
+  if (runtimeType) { return runtimeType[1]; }
+  return null;
+};

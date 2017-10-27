@@ -1,53 +1,75 @@
-module.exports = ->
-  @initConfig
-    pkg: @file.readJSON 'package.json'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+module.exports = function() {
+  this.initConfig({
+    pkg: this.file.readJSON('package.json'),
 
-    yaml:
-      schemas:
-        files: [
-          expand: true
-          cwd: 'schemata/'
-          src: '*.yml'
+    yaml: {
+      schemas: {
+        files: [{
+          expand: true,
+          cwd: 'schemata/',
+          src: '*.yml',
           dest: 'schema/'
+        }
         ]
+      }
+    },
 
-    # Coding standards
-    yamllint:
+    // Coding standards
+    yamllint: {
       schemas: ['schemata/*.yml']
+    },
 
-    coffeelint:
+    coffeelint: {
       components: [
-        'src/*.coffee'
-        'spec/*.coffee'
+        'src/*.coffee',
+        'spec/*.coffee',
         'Gruntfile.coffee'
-      ]
-      options:
-        'max_line_length':
+      ],
+      options: {
+        'max_line_length': {
           'level': 'ignore'
+        }
+      }
+    },
 
-    mochaTest:
-      nodejs:
-        src: ['spec/*.coffee']
-        options:
-          reporter: 'spec'
+    mochaTest: {
+      nodejs: {
+        src: ['spec/*.coffee'],
+        options: {
+          reporter: 'spec',
           require: 'coffee-script/register'
+        }
+      }
+    }
+  });
 
-  # Grunt plugins used for building
-  @loadNpmTasks 'grunt-yaml'
+  // Grunt plugins used for building
+  this.loadNpmTasks('grunt-yaml');
 
-  # Grunt plugins used for testing
-  @loadNpmTasks 'grunt-yamllint'
-  @loadNpmTasks 'grunt-coffeelint'
-  @loadNpmTasks 'grunt-mocha-test'
+  // Grunt plugins used for testing
+  this.loadNpmTasks('grunt-yamllint');
+  this.loadNpmTasks('grunt-coffeelint');
+  this.loadNpmTasks('grunt-mocha-test');
 
-  # Our local tasks
-  @registerTask 'build', 'Build', (target = 'all') =>
-    @task.run 'yaml'
+  // Our local tasks
+  this.registerTask('build', 'Build', target => {
+    if (target == null) { target = 'all'; }
+    return this.task.run('yaml');
+  });
 
-  @registerTask 'test', 'Build and run tests', (target = 'all') =>
-    @task.run 'coffeelint'
-    @task.run 'yamllint'
-    @task.run 'mochaTest'
+  this.registerTask('test', 'Build and run tests', target => {
+    if (target == null) { target = 'all'; }
+    this.task.run('coffeelint');
+    this.task.run('yamllint');
+    return this.task.run('mochaTest');
+  });
 
-  @registerTask 'default', ['test']
+  return this.registerTask('default', ['test']);
+};
 

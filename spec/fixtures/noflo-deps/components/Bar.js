@@ -1,1 +1,1 @@
-# @runtime noflo-nodejs
+// @runtime noflo-nodejs

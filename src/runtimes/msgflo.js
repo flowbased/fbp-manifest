@@ -1,59 +1,78 @@
-path = require 'path'
-fs = require 'fs'
-Promise = require 'bluebird'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const path = require('path');
+const fs = require('fs');
+const Promise = require('bluebird');
 
-readfile = Promise.promisify fs.readFile
+const readfile = Promise.promisify(fs.readFile);
 
-replaceMarker = (str, marker, value) ->
-  marker = '#'+marker.toUpperCase()
-  str.replace(marker, value)
+const replaceMarker = function(str, marker, value) {
+  marker = `#${marker.toUpperCase()}`;
+  return str.replace(marker, value);
+};
 
-replaceVariables = (str, variables) ->
-  for marker, value of variables
-    str = replaceMarker str, marker, value
-  return str
+const replaceVariables = function(str, variables) {
+  for (let marker in variables) {
+    const value = variables[marker];
+    str = replaceMarker(str, marker, value);
+  }
+  return str;
+};
 
-componentsFromConfig = (config) ->
-  variables = config.variables or {}
-  config.components = {} if not config.components
+const componentsFromConfig = function(config) {
+  const variables = config.variables || {};
+  if (!config.components) { config.components = {}; }
 
-  components = {}
-  for component, cmd of config.components
-    componentName = component.split('/')[1]
-    componentName = component if not componentName
-    variables['COMPONENTNAME'] = componentName
-    variables['COMPONENT'] = component
+  const components = {};
+  for (let component in config.components) {
+    const cmd = config.components[component];
+    let componentName = component.split('/')[1];
+    if (!componentName) { componentName = component; }
+    variables['COMPONENTNAME'] = componentName;
+    variables['COMPONENT'] = component;
 
-    components[component] = replaceVariables cmd, variables
-  return components
+    components[component] = replaceVariables(cmd, variables);
+  }
+  return components;
+};
 
-exports.list = (baseDir, options, callback) ->
-  packageFile = path.resolve baseDir, 'package.json'
-  readfile packageFile, 'utf-8'
-  .then (json) ->
-    packageData = JSON.parse json
-    return Promise.resolve [] unless packageData.msgflo
+exports.list = function(baseDir, options, callback) {
+  const packageFile = path.resolve(baseDir, 'package.json');
+  return readfile(packageFile, 'utf-8')
+  .then(function(json) {
+    const packageData = JSON.parse(json);
+    if (!packageData.msgflo) { return Promise.resolve([]); }
 
-    module =
-      name: packageData.name
-      description: packageData.description
-      runtime: 'msgflo'
-      base: path.relative options.root, baseDir
+    const module = {
+      name: packageData.name,
+      description: packageData.description,
+      runtime: 'msgflo',
+      base: path.relative(options.root, baseDir),
       components: []
+    };
 
-    if packageData.msgflo?.icon
-      module.icon = packageData.msgflo.icon
+    if (packageData.msgflo != null ? packageData.msgflo.icon : undefined) {
+      module.icon = packageData.msgflo.icon;
+    }
 
-    for name, definition of componentsFromConfig packageData.msgflo
-      componentName = name.split('/')[1]
-      componentName = name if not componentName
-      module.components.push
-        name: componentName
-        exec: definition
+    const object = componentsFromConfig(packageData.msgflo);
+    for (let name in object) {
+      const definition = object[name];
+      let componentName = name.split('/')[1];
+      if (!componentName) { componentName = name; }
+      module.components.push({
+        name: componentName,
+        exec: definition,
         elementary: false
+      });
+    }
 
-    Promise.resolve [module]
-  .nodeify callback
+    return Promise.resolve([module]);})
+  .nodeify(callback);
+};
 
-exports.listDependencies = (baseDir, options, callback) ->
-  return callback null, []
+exports.listDependencies = (baseDir, options, callback) => callback(null, []);

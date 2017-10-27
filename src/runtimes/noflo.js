@@ -1,220 +1,258 @@
-path = require 'path'
-fs = require 'fs'
-Promise = require 'bluebird'
-utils = require './utils'
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS104: Avoid inline assignments
+ * DS201: Simplify complex destructure assignments
+ * DS204: Change includes calls to have a more natural evaluation order
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const path = require('path');
+const fs = require('fs');
+const Promise = require('bluebird');
+const utils = require('./utils');
 
-readdir = Promise.promisify fs.readdir
-readfile = Promise.promisify fs.readFile
-stat = Promise.promisify fs.stat
+const readdir = Promise.promisify(fs.readdir);
+const readfile = Promise.promisify(fs.readFile);
+const stat = Promise.promisify(fs.stat);
 
-supportedRuntimes = [
-  'noflo'
-  'noflo-nodejs'
+const supportedRuntimes = [
+  'noflo',
+  'noflo-nodejs',
   'noflo-browser'
-]
+];
 
-listComponents = (componentDir, options, callback) ->
-  readdir componentDir
-  .then (entries) ->
-    potential = entries.filter (c) -> path.extname(c) in [
-      '.coffee'
-      '.js'
+var listComponents = function(componentDir, options, callback) {
+  readdir(componentDir)
+  .then(function(entries) {
+    const potential = entries.filter(function(c) { let needle;
+    return (needle = path.extname(c), [
+      '.coffee',
+      '.js',
       '.litcoffee'
-    ]
-    Promise.filter potential, (p) ->
-      componentPath = path.resolve componentDir, p
-      stat componentPath
-      .then (stats) ->
-        stats.isFile()
-    .then (potential) ->
-      Promise.map potential, (p) ->
-        componentPath = path.resolve componentDir, p
-        component =
-          name: null
-          path: path.relative options.root, componentPath
-          source: path.relative options.root, componentPath
+    ].includes(needle)); });
+    return Promise.filter(potential, function(p) {
+      const componentPath = path.resolve(componentDir, p);
+      return stat(componentPath)
+      .then(stats => stats.isFile());
+  }).then(potential =>
+      Promise.map(potential, function(p) {
+        const componentPath = path.resolve(componentDir, p);
+        const component = {
+          name: null,
+          path: path.relative(options.root, componentPath),
+          source: path.relative(options.root, componentPath),
           elementary: true
-        readfile componentPath, 'utf-8'
-        .then (source) ->
-          component.name = utils.parseId source, componentPath
-          component.runtime = utils.parsePlatform source
-          # Default to NoFlo on any platform
-          component.runtime = 'noflo' if component.runtime in ['all', null]
-          Promise.resolve component
-    .then (components) ->
-      potentialDirs = entries.filter (entry) -> entry not in potential
-      return Promise.resolve components unless potentialDirs.length
-      return Promise.resolve components unless options.subdirs
-      # Seek from subdirectories
-      Promise.filter potentialDirs, (d) ->
-        dirPath = path.resolve componentDir, d
-        stat dirPath
-        .then (stats) ->
-          stats.isDirectory()
-      .then (directories) ->
-        Promise.map directories, (d) ->
-          dirPath = path.resolve componentDir, d
-          listComponents = Promise.promisify listComponents
-          listComponents dirPath, options
-      .then (subDirs) ->
-        for subComponents in subDirs
-          components = components.concat subComponents
-        Promise.resolve components
-  .then (components) ->
-    Promise.resolve components.filter (c) ->
-      c.runtime in supportedRuntimes
-  .nodeify (err, components) ->
-    return callback null, [] if err and err.code is 'ENOENT'
-    return callback err if err
-    callback null, components
-  null
+        };
+        return readfile(componentPath, 'utf-8')
+        .then(function(source) {
+          component.name = utils.parseId(source, componentPath);
+          component.runtime = utils.parsePlatform(source);
+          // Default to NoFlo on any platform
+          if (['all', null].includes(component.runtime)) { component.runtime = 'noflo'; }
+          return Promise.resolve(component);
+        });
+      })).then(function(components) {
+      const potentialDirs = entries.filter(entry => !Array.from(potential).includes(entry));
+      if (!potentialDirs.length) { return Promise.resolve(components); }
+      if (!options.subdirs) { return Promise.resolve(components); }
+      // Seek from subdirectories
+      return Promise.filter(potentialDirs, function(d) {
+        const dirPath = path.resolve(componentDir, d);
+        return stat(dirPath)
+        .then(stats => stats.isDirectory());
+    }).then(directories =>
+        Promise.map(directories, function(d) {
+          const dirPath = path.resolve(componentDir, d);
+          listComponents = Promise.promisify(listComponents);
+          return listComponents(dirPath, options);
+        })).then(function(subDirs) {
+        for (let subComponents of Array.from(subDirs)) {
+          components = components.concat(subComponents);
+        }
+        return Promise.resolve(components);
+      });
+    });}).then(components =>
+    Promise.resolve(components.filter(c => Array.from(supportedRuntimes).includes(c.runtime))
+    )).nodeify(function(err, components) {
+    if (err && (err.code === 'ENOENT')) { return callback(null, []); }
+    if (err) { return callback(err); }
+    return callback(null, components);
+  });
+  return null;
+};
 
-listGraphs = (componentDir, options, callback) ->
-  readdir componentDir
-  .then (components) ->
-    potential = components.filter (c) -> path.extname(c) in [
-      '.json'
+const listGraphs = function(componentDir, options, callback) {
+  readdir(componentDir)
+  .then(function(components) {
+    const potential = components.filter(function(c) { let needle;
+    return (needle = path.extname(c), [
+      '.json',
       '.fbp'
-    ]
-    Promise.filter potential, (p) ->
-      componentPath = path.resolve componentDir, p
-      stat componentPath
-      .then (stats) ->
-        stats.isFile()
-    .then (potential) ->
-      Promise.map potential, (p) ->
-        componentPath = path.resolve componentDir, p
-        component =
-          name: null
-          path: path.relative options.root, componentPath
-          source: path.relative options.root, componentPath
+    ].includes(needle)); });
+    return Promise.filter(potential, function(p) {
+      const componentPath = path.resolve(componentDir, p);
+      return stat(componentPath)
+      .then(stats => stats.isFile());
+  }).then(potential =>
+      Promise.map(potential, function(p) {
+        const componentPath = path.resolve(componentDir, p);
+        const component = {
+          name: null,
+          path: path.relative(options.root, componentPath),
+          source: path.relative(options.root, componentPath),
           elementary: false
-        readfile componentPath, 'utf-8'
-        .then (source) ->
-          if path.extname(component.path) is '.fbp'
-            component.name = utils.parseId source, componentPath
-            component.runtime = utils.parsePlatform source
-            return Promise.resolve component
-          graph = JSON.parse source
-          component.name = graph.properties?.id or utils.parseId source, componentPath
-          component.runtime = graph.properties?.environment?.type or null
-          if graph.properties?.main
-            component.noflo = {} unless component.noflo
-            component.noflo.main = graph.properties.main
-          Promise.resolve component
-        .then (component) ->
-          # Default to NoFlo on any platform
-          component.runtime = 'noflo' if component.runtime in ['all', null]
-          Promise.resolve component
-  .then (components) ->
-    Promise.resolve components.filter (c) ->
-      # Don't register "main" graphs as modules
-      return false if c.noflo?.main
-      # Skip non-supported runtimes
-      c.runtime in supportedRuntimes
-  .nodeify (err, components) ->
-    return callback null, [] if err and err.code is 'ENOENT'
-    return callback err if err
-    callback null, components
-  null
+        };
+        return readfile(componentPath, 'utf-8')
+        .then(function(source) {
+          if (path.extname(component.path) === '.fbp') {
+            component.name = utils.parseId(source, componentPath);
+            component.runtime = utils.parsePlatform(source);
+            return Promise.resolve(component);
+          }
+          const graph = JSON.parse(source);
+          component.name = (graph.properties != null ? graph.properties.id : undefined) || utils.parseId(source, componentPath);
+          component.runtime = __guard__(graph.properties != null ? graph.properties.environment : undefined, x => x.type) || null;
+          if (graph.properties != null ? graph.properties.main : undefined) {
+            if (!component.noflo) { component.noflo = {}; }
+            component.noflo.main = graph.properties.main;
+          }
+          return Promise.resolve(component);}).then(function(component) {
+          // Default to NoFlo on any platform
+          if (['all', null].includes(component.runtime)) { component.runtime = 'noflo'; }
+          return Promise.resolve(component);
+        });
+      })
+    );}).then(components =>
+    Promise.resolve(components.filter(function(c) {
+      // Don't register "main" graphs as modules
+      if (c.noflo != null ? c.noflo.main : undefined) { return false; }
+      // Skip non-supported runtimes
+      return Array.from(supportedRuntimes).includes(c.runtime);
+    })
+    )).nodeify(function(err, components) {
+    if (err && (err.code === 'ENOENT')) { return callback(null, []); }
+    if (err) { return callback(err); }
+    return callback(null, components);
+  });
+  return null;
+};
 
-getModuleInfo = (baseDir, options, callback) ->
-  packageFile = path.resolve baseDir, 'package.json'
-  readfile packageFile, 'utf-8'
-  .catch (e) ->
-    return Promise.reject e unless e?.code is 'ENOENT'
-    # Fake package with just dirname
-    Promise.resolve
-      name: path.basename baseDir
+const getModuleInfo = function(baseDir, options, callback) {
+  const packageFile = path.resolve(baseDir, 'package.json');
+  return readfile(packageFile, 'utf-8')
+  .catch(function(e) {
+    if ((e != null ? e.code : undefined) !== 'ENOENT') { return Promise.reject(e); }
+    // Fake package with just dirname
+    return Promise.resolve({
+      name: path.basename(baseDir),
       description: null
-  .then (json) ->
-    return Promise.resolve json if typeof json is 'object'
-    Promise.resolve JSON.parse json
-  .then (packageData) ->
-    module =
-      name: packageData.name
+    });}).then(function(json) {
+    if (typeof json === 'object') { return Promise.resolve(json); }
+    return Promise.resolve(JSON.parse(json));}).then(function(packageData) {
+    const module = {
+      name: packageData.name,
       description: packageData.description
+    };
 
-    if packageData.noflo?.icon
-      module.icon = packageData.noflo.icon
+    if (packageData.noflo != null ? packageData.noflo.icon : undefined) {
+      module.icon = packageData.noflo.icon;
+    }
 
-    if packageData.noflo?.loader
-      module.noflo = {} unless module.noflo
-      module.noflo.loader = packageData.noflo.loader
+    if (packageData.noflo != null ? packageData.noflo.loader : undefined) {
+      if (!module.noflo) { module.noflo = {}; }
+      module.noflo.loader = packageData.noflo.loader;
+    }
 
-    module.name = '' if module.name is 'noflo'
-    module.name = module.name.replace /\@[a-z\-]+\//, '' if module.name[0] is '@'
-    module.name = module.name.replace 'noflo-', ''
+    if (module.name === 'noflo') { module.name = ''; }
+    if (module.name[0] === '@') { module.name = module.name.replace(/\@[a-z\-]+\//, ''); }
+    module.name = module.name.replace('noflo-', '');
 
-    Promise.resolve module
-  .nodeify (err, module) ->
-    return callback null, null if err and err.code is 'ENOENT'
-    return callback err if err
-    callback null, module
+    return Promise.resolve(module);}).nodeify(function(err, module) {
+    if (err && (err.code === 'ENOENT')) { return callback(null, null); }
+    if (err) { return callback(err); }
+    return callback(null, module);
+  });
+};
 
-exports.list = (baseDir, options, callback) ->
-  listC = Promise.promisify listComponents
-  listG = Promise.promisify listGraphs
-  getModule = Promise.promisify getModuleInfo
-  Promise.all [
-    getModule baseDir, options
-    listC path.resolve(baseDir, 'components/'), options
-    listG path.resolve(baseDir, 'graphs/'), options
-  ]
-  .then ([module, components, graphs]) ->
-    return Promise.resolve [] unless module
-    runtimes = {}
-    for c in components
-      runtimes[c.runtime] = [] unless runtimes[c.runtime]
-      runtimes[c.runtime].push c
-      delete c.runtime
-    for c in graphs
-      runtimes[c.runtime] = [] unless runtimes[c.runtime]
-      runtimes[c.runtime].push c
-      delete c.runtime
+exports.list = function(baseDir, options, callback) {
+  const listC = Promise.promisify(listComponents);
+  const listG = Promise.promisify(listGraphs);
+  const getModule = Promise.promisify(getModuleInfo);
+  return Promise.all([
+    getModule(baseDir, options),
+    listC(path.resolve(baseDir, 'components/'), options),
+    listG(path.resolve(baseDir, 'graphs/'), options)
+  ])
+  .then(function(...args) {
+    const [module, components, graphs] = Array.from(args[0]);
+    if (!module) { return Promise.resolve([]); }
+    const runtimes = {};
+    for (var c of Array.from(components)) {
+      if (!runtimes[c.runtime]) { runtimes[c.runtime] = []; }
+      runtimes[c.runtime].push(c);
+      delete c.runtime;
+    }
+    for (c of Array.from(graphs)) {
+      if (!runtimes[c.runtime]) { runtimes[c.runtime] = []; }
+      runtimes[c.runtime].push(c);
+      delete c.runtime;
+    }
 
-    modules = []
-    for k, v of runtimes
-      modules.push
-        name: module.name
-        description: module.description
-        runtime: k
-        noflo: module.noflo
-        base: path.relative options.root, baseDir
-        icon: module.icon
+    const modules = [];
+    for (let k in runtimes) {
+      const v = runtimes[k];
+      modules.push({
+        name: module.name,
+        description: module.description,
+        runtime: k,
+        noflo: module.noflo,
+        base: path.relative(options.root, baseDir),
+        icon: module.icon,
         components: v
+      });
+    }
 
-    if graphs.length is 0 and components.length is 0 and module.noflo?.loader
-      # Component that only provides a custom loader, register for "noflo"
-      modules.push
-        name: module.name
-        description: module.description
-        runtime: 'noflo'
-        noflo: module.noflo
-        base: path.relative options.root, baseDir
-        icon: module.icon
-        components: []
+    if ((graphs.length === 0) && (components.length === 0) && (module.noflo != null ? module.noflo.loader : undefined)) {
+      // Component that only provides a custom loader, register for "noflo"
+      modules.push({
+        name: module.name,
+        description: module.description,
+        runtime: 'noflo',
+        noflo: module.noflo,
+        base: path.relative(options.root, baseDir),
+        icon: module.icon,
+        components: []});
+    }
 
-    Promise.resolve modules
-  .nodeify callback
+    return Promise.resolve(modules);}).nodeify(callback);
+};
 
-exports.listDependencies = (baseDir, options, callback) ->
-  depsDir = path.resolve baseDir, 'node_modules/'
-  readdir depsDir
-  .then (deps) ->
-    deps = deps.filter (d) -> d[0] isnt '.'
-    Promise.map deps, (d) ->
-      depsPath = path.resolve depsDir, d
-      unless d[0] is '@'
-        return Promise.resolve [depsPath]
-      readdir depsPath
-      .then (subDeps) ->
-        Promise.resolve subDeps.map (s) -> path.resolve depsPath, s
-    .then (depsPaths) ->
-      deps = []
-      deps = deps.concat d for d in depsPaths
-      Promise.resolve deps
-  .nodeify (err, deps) ->
-    return callback null, [] if err and err.code is 'ENOENT'
-    return callback err if err
-    callback null, deps
+exports.listDependencies = function(baseDir, options, callback) {
+  const depsDir = path.resolve(baseDir, 'node_modules/');
+  return readdir(depsDir)
+  .then(function(deps) {
+    deps = deps.filter(d => d[0] !== '.');
+    return Promise.map(deps, function(d) {
+      const depsPath = path.resolve(depsDir, d);
+      if (d[0] !== '@') {
+        return Promise.resolve([depsPath]);
+      }
+      return readdir(depsPath)
+      .then(subDeps => Promise.resolve(subDeps.map(s => path.resolve(depsPath, s))));
+  }).then(function(depsPaths) {
+      deps = [];
+      for (let d of Array.from(depsPaths)) { deps = deps.concat(d); }
+      return Promise.resolve(deps);
+    });}).nodeify(function(err, deps) {
+    if (err && (err.code === 'ENOENT')) { return callback(null, []); }
+    if (err) { return callback(err); }
+    return callback(null, deps);
+  });
+};
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}
