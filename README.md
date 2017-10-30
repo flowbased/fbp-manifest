@@ -7,7 +7,7 @@ Manifest files can be used by the FBP runtimes themselves for component loading,
 
 ## Status
 
-Early stages
+Used in production with NoFlo, both for Node.js and for [producing browser builds](https://github.com/noflo/noflo-component-loader).
 
 ## Tools
 
