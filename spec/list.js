@@ -2,25 +2,25 @@
     no-undef,
 */
 const chai = require('chai');
-const manifest = require('../index.js');
 const path = require('path');
+const manifest = require('../index.js');
 
-describe('Listing components', function () {
-  it('should fail without provided runtimes', function (done) {
+describe('Listing components', () => {
+  it('should fail without provided runtimes', (done) => {
     const baseDir = path.resolve(__dirname, 'fixtures/noflo-basic');
-    return manifest.list.list(baseDir, {}, function (err, components) {
+    manifest.list.list(baseDir, {}, (err) => {
       chai.expect(err).to.be.an('error');
       return done();
     });
   });
 
-  return it('should find NoFlo components', function (done) {
+  return it('should find NoFlo components', (done) => {
     const baseDir = path.resolve(__dirname, 'fixtures/noflo-basic');
     return manifest.list.list(baseDir, {
       runtimes: ['noflo'],
-      recursive: true
-    }
-      , function (err, modules) {
+      recursive: true,
+    },
+    (err, modules) => {
       if (err) { return done(err); }
       chai.expect(modules.length).to.equal(2);
       const [common] = Array.from(modules.filter(m => m.runtime === 'noflo'));

@@ -1,41 +1,32 @@
-/* eslint-disable
-    no-unused-vars,
-*/
-// TODO: This file was updated by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-let main;
+const program = require('commander');
 const loader = require('./load');
 
-const countStats = function (baseDir, options, callback) {
-  options.recursive = true;
-  return loader.load(baseDir, options, function (err, manifest) {
+function countStats(baseDir, options, callback) {
+  const opts = {
+    ...options,
+    recursive: true,
+  };
+  return loader.load(baseDir, opts, (err, manifest) => {
     if (err) { return callback(err); }
     let local = 0;
     let deps = 0;
-    for (let module of Array.from(manifest.modules)) {
+    manifest.modules.forEachj((module) => {
       if (module.base === '') {
         local += module.components.length;
-        continue;
+        return;
       }
       deps += module.components.length;
-    }
+    });
     return callback(null, {
       local,
-      deps
-    }
-    );
+      deps,
+    });
   });
-};
+}
 
-exports.main = (main = function () {
+exports.main = () => {
   const list = val => val.split(',');
-  const program = require('commander')
+  program
     .option('--runtimes <runtimes>', 'List components from runtimes', list)
     .option('--manifest <manifest>', 'Manifest file to use. Default is fbp.json', 'fbp.json')
     .arguments('<basedir>')
@@ -45,7 +36,7 @@ exports.main = (main = function () {
     program.args.push(process.cwd());
   }
 
-  return countStats(program.args[0], program, function (err, stats) {
+  return countStats(program.args[0], program, (err, stats) => {
     let reuse;
     if (err) {
       console.log(err);
@@ -62,4 +53,4 @@ exports.main = (main = function () {
     console.log(`       Reuse ratio: ${reuse}%`);
     return process.exit(0);
   });
-});
+};

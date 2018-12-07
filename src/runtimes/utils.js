@@ -10,13 +10,13 @@
  */
 const path = require('path');
 
-exports.parseId = function (source, filepath) {
+exports.parseId = (source, filepath) => {
   const id = source.match(/@name ([A-Za-z0-9]+)/);
   if (id) { return id[1]; }
   return path.basename(filepath, path.extname(filepath));
 };
 
-exports.parsePlatform = function (source) {
+exports.parsePlatform = (source) => {
   const runtimeType = source.match(/@runtime ([a-z\-]+)/);
   if (runtimeType) { return runtimeType[1]; }
   return null;

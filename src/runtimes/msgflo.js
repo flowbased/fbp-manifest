@@ -1,49 +1,44 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const path = require('path');
 const fs = require('fs');
 const Promise = require('bluebird');
 
 const readfile = Promise.promisify(fs.readFile);
 
-const replaceMarker = function (str, marker, value) {
-  marker = `#${marker.toUpperCase()}`;
-  return str.replace(marker, value);
-};
+function replaceMarker(str, marker, value) {
+  return str.replace(`#${marker.toUpperCase()}`, value);
+}
 
-const replaceVariables = function (str, variables) {
-  for (let marker in variables) {
+function replaceVariables(string, variables) {
+  let str = string;
+  Object.keys(variables).forEach((marker) => {
     const value = variables[marker];
     str = replaceMarker(str, marker, value);
-  }
+  });
   return str;
-};
+}
 
-const componentsFromConfig = function (config) {
+function componentsFromConfig(c) {
+  const config = c;
   const variables = config.variables || {};
   if (!config.components) { config.components = {}; }
 
   const components = {};
-  for (let component in config.components) {
+  Object.keys(config.components).forEach((component) => {
     const cmd = config.components[component];
     let componentName = component.split('/')[1];
     if (!componentName) { componentName = component; }
-    variables['COMPONENTNAME'] = componentName;
-    variables['COMPONENT'] = component;
+    variables.COMPONENTNAME = componentName;
+    variables.COMPONENT = component;
 
     components[component] = replaceVariables(cmd, variables);
-  }
+  });
   return components;
-};
+}
 
-exports.list = function (baseDir, options, callback) {
+exports.list = (baseDir, options, callback) => {
   const packageFile = path.resolve(baseDir, 'package.json');
   return readfile(packageFile, 'utf-8')
-    .then(function (json) {
+    .then((json) => {
       const packageData = JSON.parse(json);
       if (!packageData.msgflo) { return Promise.resolve([]); }
 
@@ -52,7 +47,7 @@ exports.list = function (baseDir, options, callback) {
         description: packageData.description,
         runtime: 'msgflo',
         base: path.relative(options.root, baseDir),
-        components: []
+        components: [],
       };
 
       if (packageData.msgflo != null ? packageData.msgflo.icon : undefined) {
@@ -60,16 +55,16 @@ exports.list = function (baseDir, options, callback) {
       }
 
       const object = componentsFromConfig(packageData.msgflo);
-      for (let name in object) {
+      Object.keys(object).forEach((name) => {
         const definition = object[name];
         let componentName = name.split('/')[1];
         if (!componentName) { componentName = name; }
         module.components.push({
           name: componentName,
           exec: definition,
-          elementary: false
+          elementary: false,
         });
-      }
+      });
 
       return Promise.resolve([module]);
     })
