@@ -1,49 +1,42 @@
-/* eslint-disable
-    no-unused-vars,
-*/
-// TODO: This file was updated by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-let main;
 const clone = require('clone');
 const path = require('path');
 const fs = require('fs');
 const fbp = require('fbp');
 const Promise = require('bluebird');
+const program = require('commander');
 const loader = require('./load');
 
-const loadGraph = (graphPath, callback) =>
-  fs.readFile(graphPath, 'utf-8', function (err, content) {
-    let e, graph;
-    if (err) { return callback(err); }
+function loadGraph(graphPath, callback) {
+  return fs.readFile(graphPath, 'utf-8', (err, content) => {
+    if (err) {
+      callback(err);
+      return;
+    }
+    let graph;
     if (path.extname(graphPath) === '.fbp') {
       try {
         graph = fbp.parse(content);
       } catch (error) {
-        e = error;
-        return callback(e);
+        callback(error);
+        return;
       }
-      return callback(null, graph);
+      callback(null, graph);
+      return;
     }
     try {
       graph = JSON.parse(content);
-    } catch (error1) {
-      e = error1;
-      return callback(e);
+    } catch (error) {
+      callback(error);
     }
-    return callback(null, graph);
-  })
-;
+    callback(null, graph);
+  });
+}
 
-exports.findComponent = function (modules, component) {
-  for (let m of Array.from(modules)) {
-    for (let c of Array.from(m.components)) {
+exports.findComponent = (modules, component) => {
+  for (let i = 0; i < modules.length; i += 1) {
+    const m = modules[i];
+    for (let ii = 0; ii < m.components.length; ii += 1) {
+      const c = m.components[ii];
       if ((c.name === component) || (`${m.name}/${c.name}` === component)) {
         return c;
       }
@@ -52,15 +45,15 @@ exports.findComponent = function (modules, component) {
   return null;
 };
 
-exports.checkCustomLoaderInModules = function (modules, component) {
-  for (let m of Array.from(modules)) {
-    if (exports.checkCustomLoader(m, component)) { return true; }
-    continue;
+exports.checkCustomLoaderInModules = (modules, component) => {
+  const foundLoader = modules.find(m => exports.checkCustomLoader(m, component));
+  if (foundLoader) {
+    return true;
   }
   return false;
 };
 
-exports.checkCustomLoader = function (module, component) {
+exports.checkCustomLoader = (module, component) => {
   if (!component) { return false; }
   if (!(module.noflo != null ? module.noflo.loader : undefined)) { return false; }
   const componentModule = component.split('/')[0];
@@ -68,13 +61,13 @@ exports.checkCustomLoader = function (module, component) {
   return true;
 };
 
-exports.filterModules = function (modules, components, callback) {
+exports.filterModules = (modules, components, callback) => {
   let componentsFound = [];
   const filteredModules = [];
 
-  modules.forEach(function (m) {
+  modules.forEach((m) => {
     // Filter components list to only the ones used in graph(s)
-    const foundComponents = m.components.filter(function (c) {
+    const foundComponents = m.components.filter((c) => {
       if (!c) { return false; }
       let foundAsDependency = false;
       if (Array.from(components).includes(c.name)) {
@@ -88,7 +81,7 @@ exports.filterModules = function (modules, components, callback) {
       return foundAsDependency;
     });
     // Check if graph(s) depend on dynamically loaded components
-    const customLoaderComponents = components.filter(function (c) {
+    const customLoaderComponents = components.filter((c) => {
       if (!c) { return false; }
       if (exports.checkCustomLoader(m, c)) {
         return true;
@@ -99,25 +92,29 @@ exports.filterModules = function (modules, components, callback) {
     if (!foundComponents.length && !customLoaderComponents.length) { return; }
     const newModule = clone(m);
     newModule.components = foundComponents;
-    return filteredModules.push(newModule);
+    filteredModules.push(newModule);
   });
 
-  components = components.filter(c => componentsFound.indexOf(c) === -1);
-
-  if (components.length) {
-    return callback(new Error(`Missing components: ${components.join(', ')}`));
+  const missingComponents = components.filter(c => componentsFound.indexOf(c) === -1);
+  if (missingComponents.length) {
+    callback(new Error(`Missing components: ${missingComponents.join(', ')}`));
+    return;
   }
-  return callback(null, filteredModules);
+  callback(null, filteredModules);
 };
 
-exports.resolve = function (modules, component, options, callback) {
+exports.resolve = (modules, component, options, callback) => {
   const componentFound = exports.findComponent(modules, component);
   if (!componentFound) {
     // Check if the dependended module registers a custom loader
     const customLoader = exports.checkCustomLoaderInModules(modules, component);
-    if (customLoader) { return callback(null, [component]); }
+    if (customLoader) {
+      callback(null, [component]);
+      return;
+    }
     // Otherwise we fail with missing dependency
-    return callback(new Error(`Component ${component} not available`));
+    callback(new Error(`Component ${component} not available`));
+    return;
   }
 
   if (componentFound.elementary) {
@@ -126,52 +123,66 @@ exports.resolve = function (modules, component, options, callback) {
   }
 
   if (!componentFound.source) {
-    return callback(new Error(`Graph source not available for ${component}`));
+    callback(new Error(`Graph source not available for ${component}`));
+    return;
   }
 
   const graphPath = path.resolve(options.baseDir, componentFound.source);
-  return loadGraph(graphPath, function (err, graph) {
+  loadGraph(graphPath, (err, graph) => {
     if (err) { return callback(err); }
     const components = [];
-    for (let k in graph.processes) {
+    Object.keys(graph.processes).forEach((k) => {
       const v = graph.processes[k];
-      if (!v.component) { continue; }
+      if (!v.component) { return; }
       components.push(v.component);
-    }
+    });
 
     const resolver = Promise.promisify(exports.resolve);
-    return Promise.map(components, c => resolver(modules, c, options)).nodeify(function (err, deps) {
-      if (err != null ? err.cause : undefined) { return callback(err.cause); }
-      if (err) { return callback(err); }
-      const subs = [component];
-      for (let s of Array.from(deps)) {
-        for (let sc of Array.from(s)) {
-          if (subs.indexOf(sc) !== -1) { continue; }
-          subs.push(sc);
+    return Promise.map(components, c => resolver(modules, c, options)).nodeify((e, deps) => {
+      if (e) {
+        if (e.cause) {
+          callback(e.cause);
+          return;
         }
+        callback(e);
       }
-      return callback(null, subs);
+      const subs = [component];
+      deps.forEach((s) => {
+        s.forEach((sc) => {
+          if (subs.indexOf(sc) !== -1) { return; }
+          subs.push(sc);
+        });
+      });
+      callback(null, subs);
     });
   });
 };
 
-exports.find = (modules, component, options, callback) =>
-  exports.resolve(modules, component, options, function (err, components) {
+exports.find = (modules, component, options, callback) => exports.resolve(
+  modules,
+  component,
+  options,
+  (err, components) => {
     if (err) { return callback(err); }
     return exports.filterModules(modules, components, callback);
-  })
-;
+  },
+);
 
-exports.loadAndFind = (baseDir, component, options, callback) =>
-  loader.load(baseDir, options, function (err, manifest) {
-    if (err) { return callback(err); }
-    return exports.find(manifest.modules, component, options, callback);
-  })
-;
+exports.loadAndFind = (baseDir, component, options, callback) => loader.load(
+  baseDir,
+  options,
+  (err, manifest) => {
+    if (err) {
+      callback(err);
+      return;
+    }
+    exports.find(manifest.modules, component, options, callback);
+  },
+);
 
-exports.main = (main = function () {
+exports.main = () => {
   const list = val => val.split(',');
-  const program = require('commander')
+  program
     .option('--runtimes <runtimes>', 'List components from runtimes', list)
     .option('--manifest <manifest>', 'Manifest file to use. Default is fbp.json', 'fbp.json')
     .arguments('<basedir> <component>')
@@ -182,8 +193,8 @@ exports.main = (main = function () {
   }
 
   program.recursive = true;
-  program.baseDir = program.args[0];
-  return exports.loadAndFind(program.args[0], program.args[1], program, function (err, dependedModules) {
+  [program.baseDir] = program.args;
+  return exports.loadAndFind(program.args[0], program.args[1], program, (err, dependedModules) => {
     if (err) {
       console.error(err);
       process.exit(1);
@@ -191,9 +202,9 @@ exports.main = (main = function () {
     const manifest = {
       main: exports.findComponent(dependedModules, program.args[1]),
       version: 1,
-      modules: dependedModules
+      modules: dependedModules,
     };
     console.log(JSON.stringify(manifest, null, 2));
-    return process.exit(0);
+    process.exit(0);
   });
-});
+};

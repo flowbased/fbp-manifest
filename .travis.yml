@@ -1,23 +1,15 @@
 language: node_js
 node_js:
-- 'lts/*'
+- lts/*
 before_script:
 - npm install grunt-cli -g
 after_success:
-- ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls
-env:
-- CXX=g++-4.8
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-4.8
+- "npx nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls"
 deploy:
   provider: npm
   email: henri.bergius@iki.fi
   api_key:
-    secure: LiCV/b521vz3vyYMh/14x5KvlpkmOk+cNOksflySrBJ6of/HydrD5r3hNkGRO/nNdj6WsCOEv55O/Jr01WyOztrFv4dD8jjJgYafKLrLD0HKAO+KSA9IWmJEQvMwsugNn2eB2zi3Ij2LRNDApab11qBCsm3awrt6UjYwcK1OvNh+BFkmSSEtKM2KOOaCZcGVwAUHd8/0mGEJVmxLW5U3lqmPWcXb3KkvFfsZ6p1HYQIpHQlC8hNOH2cIPx11PKQWRQ8tVvKSrCYFEce7Q6Vdt/5sXp5pWPvoBv3gJnUwAc+wdg7EcN5boIY1dOWY2d7Orcy2vZ1QcoTk68TFTdvrecn+qmHATKmh5OEdaBNmrx9cqDlZJZCHdzjnMV6pqfskqzzuYOLkQOvmlbM/57XHznNuph3XLKJILNiyz8TpD8BuG4p7Z88TD1IaXuyl9K6P5AEKH6/wCB2+skaKLDd1euEX/eibTtaCKzWOviqpUEp9zZyJHLF0Kf4M2AIII7wvZmSbHFMcxnh7mCqa2KUqRtNW/et2CflZtfF4KKWYqmbcyMci3Fg/FRWMbiZREOxzO1SOE/O6Zt3vxlgdAd/ArmzecByO1YH4aEUQ0CEMvaqmvpS7kr4/4boFjpWklrrSpenmFaMgWL7r9UeOWPRmQ77zlfa2pzeOm6Bm6+qEznk=
+    secure: v/b0YY8emGCgzQ/BdFzWWHNXToiQVqYcr9em60d1nrRITkkQbJcGhczzBImo4+f0RmIRKzcrD0kLAvkQTxS4n9WT0LSBb1wtGtTK2drOws9SBjMIFoSMXxmR96MuF3tR6dnm4MhwUPYjewbrDleYqd8oKbAR6+J1KcS3gOFgLfNE2xWxl4vwiUj7mmOHtuvEMDITtxqI39HYrNFF9XHREy/SwqGKoJ3c+NiMqP+Tnrbk8GeMFU+p5CF0OzVUA2dlKVirmt/ctFWBk9+DehMNezVleroO9+dAmdhFfvbcu00IEcrWk/VjeAtkQQKGSnUsLKa9nhKY+13yok7T1jaknvSXs/YD79Yd4rtQUT3s8UcVORBIfnpCXhf3POIW1IEdOrUboi+OBMohMgUQMSNVUKls1BympA7drzitJ3QoYnCY/GMvT/KutBYWSXKODW6kTck/obV9WTpWgbuEtRC751ZwzY4NwaC+HSNVmtTUvtvhRYEpyDGJ7fAIshYMPVZGebLiTfLAwky6NOuIVG4/You95soSHgFlxmsQKPR7ldjaIpFSo6CdV4nZAmA4Y0oR+U2Aun0sEYqFEj30QBe3RpRA3erDgMjDbqCu9cmbKsWVR6WTuP/KhAZOtMUFJ/qWznWXPDJDT0g1pjmE4rwUCYcdkyWJC1Tct+nPtJMlveQ=
   on:
     tags: true
     repo: flowbased/fbp-manifest

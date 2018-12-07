@@ -1,15 +1,9 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 module.exports = function () {
   this.initConfig({
     pkg: this.file.readJSON('package.json'),
 
     eslint: {
-      target: ['*.js', 'src/*.js', 'src/**/*.js']
+      target: ['*.js', 'src/*.js', 'src/**/*.js'],
     },
 
     yaml: {
@@ -18,25 +12,25 @@ module.exports = function () {
           expand: true,
           cwd: 'schemata/',
           src: '*.yml',
-          dest: 'schema/'
-        }
-        ]
-      }
+          dest: 'schema/',
+        },
+        ],
+      },
     },
 
     // Coding standards
     yamllint: {
-      schemas: ['schemata/*.yml']
+      schemas: ['schemata/*.yml'],
     },
 
     mochaTest: {
       nodejs: {
         src: ['spec/*.js'],
         options: {
-          reporter: 'spec'
-        }
-      }
-    }
+          reporter: 'spec',
+        },
+      },
+    },
   });
 
   // Grunt plugins used for building
@@ -48,17 +42,15 @@ module.exports = function () {
   this.loadNpmTasks('grunt-mocha-test');
 
   // Our local tasks
-  this.registerTask('build', 'Build', target => {
-    if (target == null) { target = 'all'; }
-    return this.task.run('yaml');
+  this.registerTask('build', 'Build', () => {
+    this.task.run('yaml');
   });
 
-  this.registerTask('test', 'Build and run tests', target => {
-    if (target == null) { target = 'all'; }
+  this.registerTask('test', 'Build and run tests', () => {
     this.task.run('eslint');
     this.task.run('yamllint');
-    return this.task.run('mochaTest');
+    this.task.run('mochaTest');
   });
 
-  return this.registerTask('default', ['test']);
+  this.registerTask('default', ['test']);
 };
