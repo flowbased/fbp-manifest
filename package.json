@@ -34,7 +34,7 @@
     "grunt-yaml": "^0.4.2",
     "grunt-yamllint": "^0.3.0",
     "mocha": "^5.0.0",
-    "nyc": "^14.0.0"
+    "nyc": "^15.0.0"
   },
   "dependencies": {
     "bluebird": "^3.3.4",
