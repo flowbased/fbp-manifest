@@ -24,7 +24,7 @@
   "homepage": "https://github.com/flowbased/fbp-manifest#readme",
   "devDependencies": {
     "chai": "^4.0.1",
-    "coveralls": "^3.0.0",
+    "coveralls": "^3.0.11",
     "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
