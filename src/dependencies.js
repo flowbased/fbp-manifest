@@ -46,7 +46,7 @@ exports.findComponent = (modules, component) => {
 };
 
 exports.checkCustomLoaderInModules = (modules, component) => {
-  const foundLoader = modules.find(m => exports.checkCustomLoader(m, component));
+  const foundLoader = modules.find((m) => exports.checkCustomLoader(m, component));
   if (foundLoader) {
     return true;
   }
@@ -95,7 +95,7 @@ exports.filterModules = (modules, components, callback) => {
     filteredModules.push(newModule);
   });
 
-  const missingComponents = components.filter(c => componentsFound.indexOf(c) === -1);
+  const missingComponents = components.filter((c) => componentsFound.indexOf(c) === -1);
   if (missingComponents.length) {
     callback(new Error(`Missing components: ${missingComponents.join(', ')}`));
     return;
@@ -138,7 +138,7 @@ exports.resolve = (modules, component, options, callback) => {
     });
 
     const resolver = Promise.promisify(exports.resolve);
-    return Promise.map(components, c => resolver(modules, c, options)).nodeify((e, deps) => {
+    return Promise.map(components, (c) => resolver(modules, c, options)).nodeify((e, deps) => {
       if (e) {
         if (e.cause) {
           callback(e.cause);
@@ -181,7 +181,7 @@ exports.loadAndFind = (baseDir, component, options, callback) => loader.load(
 );
 
 exports.main = () => {
-  const list = val => val.split(',');
+  const list = (val) => val.split(',');
   program
     .option('--runtimes <runtimes>', 'List components from runtimes', list)
     .option('--manifest <manifest>', 'Manifest file to use. Default is fbp.json', 'fbp.json')
