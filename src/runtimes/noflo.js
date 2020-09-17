@@ -18,6 +18,7 @@ function listComponents(componentDir, options, callback) {
     .then((entries) => {
       const potentialComponents = entries.filter((c) => [
         '.coffee',
+        '.ts',
         '.js',
         '.litcoffee',
       ].includes(path.extname(c)));

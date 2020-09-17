@@ -79,3 +79,8 @@ It is possible to extend the manifest files with custom runtime-specific informa
 * [FBP Protocol: component](http://noflojs.org/documentation/protocol/#component)
 * [NoFlo issue 247: FBP project manifest](https://github.com/noflo/noflo/issues/247)
 * [FBP Glossary](http://www.jpaulmorrison.com/fbp/gloss.htm)
+
+## Changes
+
+* 0.2.2 (git master)
+  - Added support for finding NoFlo TypeScript components
