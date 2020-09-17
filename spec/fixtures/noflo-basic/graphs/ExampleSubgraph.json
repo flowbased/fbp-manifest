@@ -1,0 +1,17 @@
+{
+    "caseSensitive": false,
+    "properties": {
+        "name": "ExampleSubgraph",
+        "description": "",
+        "icon": "adjust",
+        "main": false,
+        "environment": {
+            "type": "noflo-nodejs"
+        }
+    },
+    "inports": {},
+    "outports": {},
+    "groups": [],
+    "processes": {},
+    "connections": []
+}

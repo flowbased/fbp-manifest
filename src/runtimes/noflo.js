@@ -108,7 +108,11 @@ function listGraphs(componentDir, options, callback) {
             }
             component.runtime = null;
             if (graph.properties && graph.properties.environment) {
-              component.runtime = graph.properties.environment;
+              if (graph.properties.environment.type) {
+                component.runtime = graph.properties.environment.type;
+              } else {
+                component.runtime = graph.properties.environment;
+              }
             }
             if (graph.properties != null ? graph.properties.main : undefined) {
               if (!component.noflo) { component.noflo = {}; }
@@ -126,7 +130,7 @@ function listGraphs(componentDir, options, callback) {
       // Don't register "main" graphs as modules
       if (c.noflo != null ? c.noflo.main : undefined) { return false; }
       // Skip non-supported runtimes
-      return Array.from(supportedRuntimes).includes(c.runtime);
+      return supportedRuntimes.includes(c.runtime);
     }))).nodeify((err, components) => {
       if (err && (err.code === 'ENOENT')) { return callback(null, []); }
       if (err) { return callback(err); }
