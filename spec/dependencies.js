@@ -22,7 +22,7 @@ describe('Finding component dependencies', () => {
       });
     });
     describe('with elementary component', () => {
-      it('should fail on missing component', done => manifest.dependencies.find(modules, 'basic/Baz',
+      it('should fail on missing component', done => manifest.dependencies.find(modules, 'basic/FooBaz',
         { baseDir },
         (err) => {
           chai.expect(err).to.be.an('error');
