@@ -82,5 +82,5 @@ It is possible to extend the manifest files with custom runtime-specific informa
 
 ## Changes
 
-* 0.2.2 (git master)
+* 0.2.2 (2020-09-17)
   - Added support for finding NoFlo TypeScript components
