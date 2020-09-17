@@ -1,4 +1,4 @@
-Flow-Based Programming Manifest Tools [![Build Status](https://travis-ci.org/flowbased/fbp-manifest.svg?branch=master)](https://travis-ci.org/flowbased/fbp-manifest) [![Greenkeeper badge](https://badges.greenkeeper.io/flowbased/fbp-manifest.svg)](https://greenkeeper.io/) [![Coverage Status](https://coveralls.io/repos/github/flowbased/fbp-manifest/badge.svg?branch=master)](https://coveralls.io/github/flowbased/fbp-manifest?branch=master)
+Flow-Based Programming Manifest Tools [![Build Status](https://travis-ci.org/flowbased/fbp-manifest.svg?branch=master)](https://travis-ci.org/flowbased/fbp-manifest) [![Coverage Status](https://coveralls.io/repos/github/flowbased/fbp-manifest/badge.svg?branch=master)](https://coveralls.io/github/flowbased/fbp-manifest?branch=master)
 =====================================
 
 This repository provides a schema for Flow-Based Programming manifest (`fbp.json`) files, as well as tools for populating and validating them. The purpose of FBP manifest files is to provide a platform-agnostic registry of flow-based components available in a project.
