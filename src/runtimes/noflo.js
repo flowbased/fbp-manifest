@@ -104,7 +104,7 @@ function listGraphs(componentDir, options, callback) {
             if (graph.properties && graph.properties.id) {
               component.name = graph.properties.id;
             } else {
-              component.name = utils.parseid(source, componentPath);
+              component.name = utils.parseId(source, componentPath);
             }
             component.runtime = null;
             if (graph.properties && graph.properties.environment) {
