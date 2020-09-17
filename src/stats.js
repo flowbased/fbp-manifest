@@ -25,7 +25,7 @@ function countStats(baseDir, options, callback) {
 }
 
 exports.main = () => {
-  const list = val => val.split(',');
+  const list = (val) => val.split(',');
   program
     .option('--runtimes <runtimes>', 'List components from runtimes', list)
     .option('--manifest <manifest>', 'Manifest file to use. Default is fbp.json', 'fbp.json')

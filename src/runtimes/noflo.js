@@ -16,7 +16,7 @@ const supportedRuntimes = [
 function listComponents(componentDir, options, callback) {
   readdir(componentDir)
     .then((entries) => {
-      const potentialComponents = entries.filter(c => [
+      const potentialComponents = entries.filter((c) => [
         '.coffee',
         '.js',
         '.litcoffee',
@@ -24,8 +24,8 @@ function listComponents(componentDir, options, callback) {
       return Promise.filter(potentialComponents, (p) => {
         const componentPath = path.resolve(componentDir, p);
         return stat(componentPath)
-          .then(stats => stats.isFile());
-      }).then(potential => Promise.map(potential, (p) => {
+          .then((stats) => stats.isFile());
+      }).then((potential) => Promise.map(potential, (p) => {
         const componentPath = path.resolve(componentDir, p);
         const component = {
           name: null,
@@ -43,15 +43,15 @@ function listComponents(componentDir, options, callback) {
           });
       })).then((comps) => {
         let components = comps;
-        const potentialDirs = entries.filter(entry => !potentialComponents.includes(entry));
+        const potentialDirs = entries.filter((entry) => !potentialComponents.includes(entry));
         if (!potentialDirs.length) { return Promise.resolve(components); }
         if (!options.subdirs) { return Promise.resolve(components); }
         // Seek from subdirectories
         return Promise.filter(potentialDirs, (d) => {
           const dirPath = path.resolve(componentDir, d);
           return stat(dirPath)
-            .then(stats => stats.isDirectory());
-        }).then(directories => Promise.map(directories, (d) => {
+            .then((stats) => stats.isDirectory());
+        }).then((directories) => Promise.map(directories, (d) => {
           const dirPath = path.resolve(componentDir, d);
           return Promise.promisify(listComponents)(dirPath, options);
         })).then((subDirs) => {
@@ -62,8 +62,8 @@ function listComponents(componentDir, options, callback) {
         });
       });
     })
-    .then(components => Promise.resolve(components.filter(
-      c => supportedRuntimes.includes(c.runtime),
+    .then((components) => Promise.resolve(components.filter(
+      (c) => supportedRuntimes.includes(c.runtime),
     )))
     .nodeify((err, components) => {
       if (err && (err.code === 'ENOENT')) { return callback(null, []); }
@@ -76,15 +76,15 @@ function listComponents(componentDir, options, callback) {
 function listGraphs(componentDir, options, callback) {
   readdir(componentDir)
     .then((components) => {
-      const potentialGraphs = components.filter(c => [
+      const potentialGraphs = components.filter((c) => [
         '.json',
         '.fbp',
       ].includes(path.extname(c)));
       return Promise.filter(potentialGraphs, (p) => {
         const componentPath = path.resolve(componentDir, p);
         return stat(componentPath)
-          .then(stats => stats.isFile());
-      }).then(potential => Promise.map(potential, (p) => {
+          .then((stats) => stats.isFile());
+      }).then((potential) => Promise.map(potential, (p) => {
         const componentPath = path.resolve(componentDir, p);
         const component = {
           name: null,
@@ -121,7 +121,7 @@ function listGraphs(componentDir, options, callback) {
             return Promise.resolve(comp);
           });
       }));
-    }).then(components => Promise.resolve(components.filter((c) => {
+    }).then((components) => Promise.resolve(components.filter((c) => {
       // Don't register "main" graphs as modules
       if (c.noflo != null ? c.noflo.main : undefined) { return false; }
       // Skip non-supported runtimes
@@ -238,14 +238,14 @@ exports.listDependencies = (baseDir, options, callback) => {
   const depsDir = path.resolve(baseDir, 'node_modules/');
   return readdir(depsDir)
     .then((deps) => {
-      const suitableDeps = deps.filter(d => d[0] !== '.');
+      const suitableDeps = deps.filter((d) => d[0] !== '.');
       return Promise.map(suitableDeps, (d) => {
         const depsPath = path.resolve(depsDir, d);
         if (d[0] !== '@') {
           return Promise.resolve([depsPath]);
         }
         return readdir(depsPath)
-          .then(subDeps => Promise.resolve(subDeps.map(s => path.resolve(depsPath, s))));
+          .then((subDeps) => Promise.resolve(subDeps.map((s) => path.resolve(depsPath, s))));
       }).then((depsPaths) => {
         let selectedDeps = [];
         depsPaths.forEach((d) => {

@@ -18,7 +18,7 @@ exports.list = (baseDir, opts, callback) => {
     return;
   }
 
-  const missingRuntimes = options.runtimes.filter(r => typeof runtimes[r] === 'undefined');
+  const missingRuntimes = options.runtimes.filter((r) => typeof runtimes[r] === 'undefined');
   if (missingRuntimes.length) {
     callback(new Error(`Unsupported runtime types: ${missingRuntimes.join(', ')}`));
     return;
@@ -60,7 +60,7 @@ exports.list = (baseDir, opts, callback) => {
 
 exports.main = () => {
   const availableRuntimes = Object.keys(runtimes);
-  const list = val => val.split(',');
+  const list = (val) => val.split(',');
   program
     .option('--recursive', 'List also from dependencies', true)
     .option('--subdirs', 'List also from subdirectories of the primary component locations', true)
