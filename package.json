@@ -29,7 +29,7 @@
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.14.0",
     "grunt": "^1.0.1",
-    "grunt-eslint": "^21.0.0",
+    "grunt-eslint": "^23.0.0",
     "grunt-mocha-test": "^0.13.2",
     "grunt-yaml": "^0.4.2",
     "grunt-yamllint": "^0.3.0",
