@@ -50,7 +50,8 @@ Components are objects with the following:
 * `path`: path used for executing the component. For example a Node.js require path or Java class path
 * `exec`: command used for starting an instance of the component for components that are standalone processes
 * `elementary`: boolean on whether the component is elementary (code) or not (graph)
-* `source`: (optional) path to the source code of the component
+* `source`: (optional) path to the source code of the component, in case it differs from the component path
+* `tests`: (optional) path to the test suite of the component, typically pointing to a [fbp-spec](https://github.com/flowbased/fbp-spec) file
 * `inports`: (optional) array of inport definitions for the component
 * `outports`: (optional) array of outport definitions for the component
 
@@ -82,6 +83,8 @@ It is possible to extend the manifest files with custom runtime-specific informa
 
 ## Changes
 
+* 0.2.5 (2020-09-23)
+  - Added support for populating `tests` for each module
 * 0.2.4 (2020-09-17)
   - Fixed a minor bug with collecting NoFlo graphs
 * 0.2.2 (2020-09-17)
