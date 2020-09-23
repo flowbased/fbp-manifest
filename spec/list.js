@@ -26,6 +26,8 @@ describe('Listing components', () => {
       const [common] = Array.from(modules.filter(m => m.runtime === 'noflo'));
       chai.expect(common).to.be.an('object');
       chai.expect(common.components[0].name).to.equal('Foo');
+      chai.expect(common.components[0].tests).to.include('spec');
+      chai.expect(common.components[0].tests).to.include('Foo.yaml');
       const [nodejs] = Array.from(modules.filter(m => m.runtime === 'noflo-nodejs'));
       chai.expect(nodejs).to.be.an('object');
       chai.expect(nodejs.components.length).to.equal(4);
