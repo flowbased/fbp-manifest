@@ -159,6 +159,10 @@ function listSpecs(specDir, module, options, callback) {
         return readfile(specPath, 'utf-8')
           .then((source) => {
             const specName = utils.parseId(source, specPath);
+            if (specs[specName] && path.extname(specs[specName]) === '.yaml') {
+              // Prefer fbp-spec files
+              return;
+            }
             specs[specName] = specPath;
           });
       }))
