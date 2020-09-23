@@ -35,7 +35,8 @@ describe('Listing components', () => {
       chai.expect(nodejs.components[1].elementary).to.equal(true);
       chai.expect(nodejs.components[2].name).to.equal('ExampleSubgraph');
       chai.expect(nodejs.components[2].elementary).to.equal(false);
-      chai.expect(nodejs.components[2].tests).to.equal('spec/ExampleSubgraph.yaml');
+      chai.expect(nodejs.components[2].tests).to.include('spec');
+      chai.expect(nodejs.components[2].tests).to.include('ExampleSubgraph.yaml');
       chai.expect(nodejs.components[3].name).to.equal('Hello');
       chai.expect(nodejs.components[3].elementary).to.equal(false);
       return done();
