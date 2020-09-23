@@ -26,6 +26,11 @@ properties:
     type: string
     description: Source code path for component, if available
     example: "components/ReadYaml.coffee"
+  tests:
+    name: tests
+    type: string
+    description: Test suite path for component, if available
+    example: "spec/ReadYaml.yaml"
   exec:
     name: exec
     type: string
