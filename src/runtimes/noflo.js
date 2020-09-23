@@ -139,6 +139,47 @@ function listGraphs(componentDir, options, callback) {
   return null;
 }
 
+function listSpecs(specDir, module, options, callback) {
+  readdir(specDir)
+    .then((entries) => {
+      const potentialSpecs = entries.filter((c) => [
+        '.coffee',
+        '.ts',
+        '.js',
+        '.yaml',
+        '.yml',
+      ].includes(path.extname(c)));
+      const specs = {};
+      return Promise.filter(potentialSpecs, (p) => {
+        const specPath = path.resolve(specDir, p);
+        return stat(specPath)
+          .then((stats) => stats.isFile());
+      }).then((potential) => Promise.all(potential.map((p) => {
+        const specPath = path.resolve(specDir, p);
+        return readfile(specPath, 'utf-8')
+          .then((source) => {
+            const specName = utils.parseId(source, specPath);
+            specs[specName] = specPath;
+          });
+      }))
+        .then(() => Promise.map(module.components, (c) => {
+          if (!specs[c.name]) {
+            return c;
+          }
+          return {
+            ...c,
+            tests: path.relative(options.root, specs[c.name]),
+          };
+        })));
+    })
+    .nodeify((err, components) => {
+      if (err && (err.code === 'ENOENT')) { return callback(null, module.components); }
+      if (err) { return callback(err); }
+      return callback(null, components);
+    });
+  return null;
+}
+
 function getModuleInfo(baseDir, options, callback) {
   const packageFile = path.resolve(baseDir, 'package.json');
   return readfile(packageFile, 'utf-8')
@@ -183,6 +224,7 @@ function getModuleInfo(baseDir, options, callback) {
 exports.list = (baseDir, options, callback) => {
   const listC = Promise.promisify(listComponents);
   const listG = Promise.promisify(listGraphs);
+  const listS = Promise.promisify(listSpecs);
   const getModule = Promise.promisify(getModuleInfo);
   return Promise.all([
     getModule(baseDir, options),
@@ -191,7 +233,9 @@ exports.list = (baseDir, options, callback) => {
   ])
     .then((...args) => {
       const [module, components, graphs] = Array.from(args[0]);
-      if (!module) { return Promise.resolve([]); }
+      if (!module) {
+        return Promise.resolve([]);
+      }
       const runtimes = {};
       components.forEach((c) => {
         const component = c;
@@ -221,8 +265,8 @@ exports.list = (baseDir, options, callback) => {
       });
 
       if ((graphs.length === 0)
-        && (components.length === 0)
-        && (module.noflo != null ? module.noflo.loader : undefined)) {
+              && (components.length === 0)
+              && (module.noflo != null ? module.noflo.loader : undefined)) {
         // Component that only provides a custom loader, register for "noflo"
         modules.push({
           name: module.name,
@@ -236,7 +280,13 @@ exports.list = (baseDir, options, callback) => {
       }
 
       return Promise.resolve(modules);
-    }).nodeify(callback);
+    })
+    .then((modules) => Promise.map(modules, (m) => listS(path.resolve(baseDir, 'spec/'), m, options)
+      .then((components) => ({
+        ...m,
+        components,
+      }))))
+    .nodeify(callback);
 };
 
 exports.listDependencies = (baseDir, options, callback) => {
