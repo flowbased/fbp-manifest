@@ -83,6 +83,8 @@ It is possible to extend the manifest files with custom runtime-specific informa
 
 ## Changes
 
+* 0.2.6 (2020-09-23)
+  - If there are multiple spec files for a module, the fbp-spec file will be used by fbp-manifest
 * 0.2.5 (2020-09-23)
   - Added support for populating `tests` for each module
 * 0.2.4 (2020-09-17)
