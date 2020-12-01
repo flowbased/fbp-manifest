@@ -21,7 +21,7 @@ function listComponents(componentDir, options, callback) {
         '.ts',
         '.js',
         '.litcoffee',
-      ].includes(path.extname(c)));
+      ].includes(path.extname(c)) && c.indexOf('.d.ts') === -1);
       return Promise.filter(potentialComponents, (p) => {
         const componentPath = path.resolve(componentDir, p);
         return stat(componentPath)
