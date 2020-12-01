@@ -83,6 +83,8 @@ It is possible to extend the manifest files with custom runtime-specific informa
 
 ## Changes
 
+* 0.2.7 (2020-12-01)
+  - TypeScript definition files (`.d.ts`) are not considered as components
 * 0.2.6 (2020-09-23)
   - If there are multiple spec files for a module, the fbp-spec file will be used by fbp-manifest
 * 0.2.5 (2020-09-23)
