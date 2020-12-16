@@ -2,10 +2,6 @@ module.exports = function () {
   this.initConfig({
     pkg: this.file.readJSON('package.json'),
 
-    eslint: {
-      target: ['*.js', 'src/*.js', 'src/**/*.js'],
-    },
-
     yaml: {
       schemas: {
         files: [{
@@ -37,7 +33,6 @@ module.exports = function () {
   this.loadNpmTasks('grunt-yaml');
 
   // Grunt plugins used for testing
-  this.loadNpmTasks('grunt-eslint');
   this.loadNpmTasks('grunt-yamllint');
   this.loadNpmTasks('grunt-mocha-test');
 
@@ -47,7 +42,6 @@ module.exports = function () {
   });
 
   this.registerTask('test', 'Build and run tests', () => {
-    this.task.run('eslint');
     this.task.run('yamllint');
     this.task.run('mochaTest');
   });
