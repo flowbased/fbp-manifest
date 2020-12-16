@@ -10,7 +10,7 @@ function countStats(baseDir, options, callback) {
     if (err) { return callback(err); }
     let local = 0;
     let deps = 0;
-    manifest.modules.forEachj((module) => {
+    manifest.modules.forEach((module) => {
       if (module.base === '') {
         local += module.components.length;
         return;
