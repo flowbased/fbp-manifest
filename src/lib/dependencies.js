@@ -139,6 +139,7 @@ exports.resolve = (modules, component, options) => {
           .resolve(modules, c, options)
           .catch(() => [])))
         .then((deps) => {
+          deps.push([component]);
           deps.forEach((subDeps) => {
             subDeps.forEach((dep) => {
               if (components.indexOf(dep) !== -1) {
