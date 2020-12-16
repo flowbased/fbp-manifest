@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 const program = require('commander');
 const noflo = require('./runtimes/noflo');
 const msgflo = require('./runtimes/msgflo');
@@ -37,59 +36,85 @@ const msgflo = require('./runtimes/msgflo');
  * @property {Object<string, any>} [msgflo]
  */
 
+/**
+ * @typedef FbpManifestDocument
+ * @property {number} version
+ * @property {Array<FbpManifestModule>} modules
+ */
+
+/**
+ * @typedef FbpManifestOptions
+ * @property {string[]} runtimes
+ * @property {string} [root]
+ * @property {string} [manifest]
+ * @property {string} [baseDir]
+ * @property {boolean} [subdirs]
+ * @property {boolean} [recursive]
+ * @property {boolean} [discover]
+ * @property {boolean} [silent]
+ */
+
 const runtimes = {
   noflo,
   msgflo,
 };
 
-exports.list = (baseDir, opts, callback) => {
+/**
+ * @param {string} baseDir
+ * @param {FbpManifestOptions} opts
+ * @returns {Promise<Array<FbpManifestModule>>}
+ */
+exports.list = (baseDir, opts) => {
   const options = opts;
-  if (!options.root) { options.root = baseDir; }
-  if (typeof options.subdirs === 'undefined') { options.subdirs = true; }
+  if (!options.root) {
+    options.root = baseDir;
+  }
+  if (typeof options.subdirs === 'undefined') {
+    options.subdirs = true;
+  }
 
   if (!(options.runtimes != null ? options.runtimes.length : undefined)) {
-    callback(new Error('No runtimes specified'));
-    return;
+    return Promise.reject(new Error('No runtimes specified'));
   }
 
   const missingRuntimes = options.runtimes.filter((r) => typeof runtimes[r] === 'undefined');
   if (missingRuntimes.length) {
-    callback(new Error(`Unsupported runtime types: ${missingRuntimes.join(', ')}`));
-    return;
+    return Promise.reject(new Error(`Unsupported runtime types: ${missingRuntimes.join(', ')}`));
   }
 
-  Promise.map(options.runtimes, (runtime) => {
-    const lister = Promise.promisify(runtimes[runtime].list);
-    return lister(baseDir, options);
-  }).then((results) => {
-    // Flatten
-    let modules = [];
-    results.forEach((r) => {
-      modules = modules.concat(r);
-    });
-    if (!options.recursive) { return Promise.resolve(modules); }
-    return Promise.map(options.runtimes, (runtime) => {
-      const depLister = Promise.promisify(runtimes[runtime].listDependencies);
-      return depLister(baseDir, options)
-        .map((dep) => {
-          const subLister = Promise.promisify(exports.list);
-          return subLister(dep, options);
-        }).then((subDeps) => {
+  return options.runtimes
+    .reduce((chain, runtime) => chain
+      .then((currentList) => runtimes[runtime]
+        .list(baseDir, options)
+        .then((result) => currentList.concat(result))), Promise.resolve([]))
+    .then((results) => {
+      // Flatten
+      let modules = [];
+      results.forEach((r) => {
+        modules = modules.concat(r);
+      });
+      if (!options.recursive) {
+        return Promise.resolve(modules);
+      }
+      return options.runtimes
+        .reduce((chain, runtime) => chain
+          .then((currentList) => runtimes[runtime]
+            .listDependencies(baseDir, options)
+            .then((result) => currentList.concat(result))), Promise.resolve([]))
+        .then((deps) => deps
+          .reduce((depChain, dep) => depChain
+            .then((currentList) => exports
+              .list(dep, options)
+              .then((subDeps) => currentList.concat(subDeps))), Promise.resolve([])))
+        .then((subDeps) => {
           let subs = [];
           subDeps.forEach((s) => {
             subs = subs.concat(s);
           });
-          return Promise.resolve(subs);
+          modules = modules.concat(subs);
+          return modules;
         });
-    }).then((subDeps) => {
-      let subs = [];
-      subDeps.forEach((s) => {
-        subs = subs.concat(s);
-      });
-      modules = modules.concat(subs);
-      return Promise.resolve(modules);
     });
-  }).nodeify(callback);
 };
 
 exports.main = () => {
@@ -106,16 +131,20 @@ exports.main = () => {
     program.args.push(process.cwd());
   }
 
-  return exports.list(program.args[0], program, (err, modules) => {
-    if (err) {
+  exports.list(program.args[0], {
+    recursive: program.recursive,
+    subdirs: program.subdirs,
+    runtimes: program.runtimes,
+  })
+    .then((modules) => {
+      const manifest = {
+        version: 1,
+        modules,
+      };
+      console.log(JSON.stringify(manifest, null, 2));
+      return process.exit(0);
+    }, (err) => {
       console.log(err);
       process.exit(1);
-    }
-    const manifest = {
-      version: 1,
-      modules,
-    };
-    console.log(JSON.stringify(manifest, null, 2));
-    return process.exit(0);
-  });
+    });
 };

@@ -1,39 +1,38 @@
 const path = require('path');
 const fs = require('fs');
+const { promisify } = require('util');
 const lister = require('./list');
 
-exports.load = (baseDir, opts, callback) => {
+const readFile = promisify(fs.readFile);
+
+/**
+ * @param {string} baseDir
+ * @param {lister.FbpManifestOptions} opts
+ * @returns {Promise<lister.FbpManifestDocument>}
+ */
+exports.load = (baseDir, opts) => {
   const options = opts;
-  if (typeof options.discover === 'undefined') { options.discover = true; }
-  if (!options.manifest) { options.manifest = 'fbp.json'; }
+  if (typeof options.discover === 'undefined') {
+    options.discover = true;
+  }
+  if (!options.manifest) {
+    options.manifest = 'fbp.json';
+  }
 
   const manifestPath = path.resolve(baseDir, options.manifest);
-  return fs.readFile(manifestPath, 'utf-8', (err, contents) => {
-    let manifest;
-    if (err && (err.code === 'ENOENT') && options.discover) {
-      if (!options.silent) { console.warn(`${manifestPath} not found, running auto-discovery`); }
-      lister.list(baseDir, options, (error, modules) => {
-        if (error) {
-          callback(error);
-          return;
+  return readFile(manifestPath, 'utf-8')
+    .catch((err) => {
+      if (err && (err.code === 'ENOENT') && options.discover) {
+        if (!options.silent) {
+          console.warn(`${manifestPath} not found, running auto-discovery`);
         }
-        callback(null, {
-          version: 1,
-          modules,
-        });
-      });
-      return;
-    }
-    if (err) {
-      callback(err);
-      return;
-    }
-    try {
-      manifest = JSON.parse(contents);
-    } catch (e) {
-      callback(e);
-      return;
-    }
-    callback(null, manifest);
-  });
+        return lister.list(baseDir, options)
+          .then((modules) => JSON.stringify({
+            version: 1,
+            modules,
+          }));
+      }
+      return Promise.reject(err);
+    })
+    .then((contents) => JSON.parse(contents));
 };
