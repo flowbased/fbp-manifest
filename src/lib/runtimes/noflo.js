@@ -55,8 +55,8 @@ function listComponents(componentDir, options) {
               const componentPath = path.resolve(componentDir, p);
               const component = {
                 name: null,
-                path: path.relative(options.root, componentPath),
-                source: path.relative(options.root, componentPath),
+                path: path.relative(options.root || '', componentPath),
+                source: path.relative(options.root || '', componentPath),
                 elementary: true,
               };
               return readfile(componentPath, 'utf-8')

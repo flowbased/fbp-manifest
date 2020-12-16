@@ -54,7 +54,9 @@ exports.checkCustomLoader = (module, component) => {
  * @param {Promise<Array<lister.FbpManifestModule>>} modules
  */
 exports.filterModules = (modules, components) => {
+  /** @type {string[]} */
   let componentsFound = [];
+  /** @type {Array<lister.FbpManifestModule>} */
   const filteredModules = [];
 
   modules.forEach((m) => {
@@ -123,9 +125,14 @@ exports.resolve = (modules, component, options) => {
     return Promise.reject(new Error(`Graph source not available for ${component}`));
   }
 
+  if (!options.baseDir) {
+    return Promise.reject(new Error('No baseDir provided'));
+  }
+
   const graphPath = path.resolve(options.baseDir, componentFound.source);
   return fbpGraph.graph.loadFile(graphPath)
     .then((graph) => {
+      /** @type {string[]} */
       const components = [];
       graph.nodes.forEach((node) => {
         if (!node.component) {
@@ -175,6 +182,9 @@ exports.loadAndFind = (baseDir, component, options) => loader
   .then((manifest) => exports.find(manifest.modules, component, options));
 
 exports.main = () => {
+  /**
+   * @param {string} val
+   */
   const list = (val) => val.split(',');
   program
     .option('--runtimes <runtimes>', 'List components from runtimes', list)
