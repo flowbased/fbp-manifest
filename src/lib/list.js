@@ -3,6 +3,40 @@ const program = require('commander');
 const noflo = require('./runtimes/noflo');
 const msgflo = require('./runtimes/msgflo');
 
+/**
+ * @typedef FbpManifestPort
+ * @property {string} name
+ * @property {string} [description]
+ * @property {string} type
+ * @property {boolean} addressable
+ * @property {boolean} [required]
+ */
+
+/**
+ * @typedef FbpManifestComponent
+ * @property {string} name
+ * @property {string} [description]
+ * @property {string} [path]
+ * @property {string} [source]
+ * @property {string} [tests]
+ * @property {string} [exec]
+ * @property {boolean} [elementary]
+ * @property {Array<FbpManifestPort>} [inports]
+ * @property {Array<FbpManifestPort>} [outports]
+ */
+
+/**
+ * @typedef FbpManifestModule
+ * @property {string} name
+ * @property {string} [description]
+ * @property {string} runtime
+ * @property {string} base
+ * @property {string} [icon]
+ * @property {Array<FbpManifestComponent>} components
+ * @property {Object<string, any>} [noflo]
+ * @property {Object<string, any>} [msgflo]
+ */
+
 const runtimes = {
   noflo,
   msgflo,
