@@ -4,10 +4,21 @@ const { promisify } = require('util');
 
 const readfile = promisify(fs.readFile);
 
+/**
+ * @param {string} str
+ * @param {string} marker
+ * @param {any} value
+ * @returns {string}
+ */
 function replaceMarker(str, marker, value) {
   return str.replace(`#${marker.toUpperCase()}`, value);
 }
 
+/**
+ * @param {string} string
+ * @param {Object<string, any>} variables;
+ * @returns {string}
+ */
 function replaceVariables(string, variables) {
   let str = string;
   Object.keys(variables).forEach((marker) => {
@@ -17,13 +28,24 @@ function replaceVariables(string, variables) {
   return str;
 }
 
+/**
+ * @param {Object} c
+ * @param {Object<string, any>} [c.variables]
+ * @param {Object<string, string>} [c.components]
+ */
 function componentsFromConfig(c) {
   const config = c;
   const variables = config.variables || {};
-  if (!config.components) { config.components = {}; }
+  if (!config.components) {
+    config.components = {};
+  }
 
+  /** @type {Object<string, string>} */
   const components = {};
   Object.keys(config.components).forEach((component) => {
+    if (!config.components) {
+      return;
+    }
     const cmd = config.components[component];
     let componentName = component.split('/')[1];
     if (!componentName) { componentName = component; }
@@ -54,7 +76,7 @@ exports.list = (baseDir, options) => {
         name: packageData.name,
         description: packageData.description,
         runtime: 'msgflo',
-        base: path.relative(options.root, baseDir),
+        base: path.relative(options.root || '', baseDir),
         components: [],
       };
 

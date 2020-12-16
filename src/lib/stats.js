@@ -1,6 +1,17 @@
 const program = require('commander');
 const loader = require('./load');
 
+/**
+ * @typedef FbpManifestStats
+ * @property {number} local
+ * @property {number} deps
+ */
+
+/**
+ * @param {string} baseDir
+ * @param {import("./list").FbpManifestOptions} options
+ * @returns {Promise<FbpManifestStats>}
+ */
 function countStats(baseDir, options) {
   const opts = {
     ...options,
@@ -25,6 +36,9 @@ function countStats(baseDir, options) {
 }
 
 exports.main = () => {
+  /**
+   * @param {string} val
+   */
   const list = (val) => val.split(',');
   program
     .option('--runtimes <runtimes>', 'List components from runtimes', list)
@@ -36,7 +50,10 @@ exports.main = () => {
     program.args.push(process.cwd());
   }
 
-  return countStats(program.args[0], program)
+  return countStats(program.args[0], {
+    runtimes: program.runtimes,
+    manifest: program.manifest,
+  })
     .then((stats) => {
       let reuse;
       const total = stats.local + stats.deps;
