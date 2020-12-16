@@ -7,6 +7,7 @@
   "scripts": {
     "lint": "eslint src/*.js src/**/*.js src/**/**/*.js spec/*.js",
     "typecheck": "tsc",
+    "build": "tsc",
     "pretest": "npm run lint && npm run typecheck",
     "test": "nyc grunt test"
   },
