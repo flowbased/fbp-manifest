@@ -3,7 +3,7 @@
 */
 const chai = require('chai');
 const path = require('path');
-const manifest = require('../index.js');
+const manifest = require('../src/index.js');
 
 describe('Finding component dependencies', () => {
   describe('with NoFlo module without dependecies', () => {
