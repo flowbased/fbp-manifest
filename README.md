@@ -83,9 +83,10 @@ It is possible to extend the manifest files with custom runtime-specific informa
 
 ## Changes
 
+* 0.3.1 (2020-12-16)
+  - The package now ships with TypeScript declarations
 * 0.3.0 (2020-12-16)
   - Ported from callbacks to Promises
-  - The package now ships with TypeScript declarations
 * 0.2.7 (2020-12-01)
   - TypeScript definition files (`.d.ts`) are not considered as components
 * 0.2.6 (2020-09-23)
