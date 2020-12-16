@@ -3,6 +3,7 @@
   "version": "0.2.7",
   "description": "Flow-Based Programming Manifest tools",
   "main": "src/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint src/*.js src/**/*.js src/**/**/*.js spec/*.js",
     "typecheck": "tsc",
