@@ -1,8 +1,8 @@
 const path = require('path');
 const fs = require('fs');
-const Promise = require('bluebird');
+const { promisify } = require('util');
 
-const readfile = Promise.promisify(fs.readFile);
+const readfile = promisify(fs.readFile);
 
 function replaceMarker(str, marker, value) {
   return str.replace(`#${marker.toUpperCase()}`, value);
@@ -35,13 +35,21 @@ function componentsFromConfig(c) {
   return components;
 }
 
-exports.list = (baseDir, options, callback) => {
+/**
+ * @param {string} baseDir
+ * @param {import("../list").FbpManifestOptions} options
+ * @returns {Promise<Array<import("../list").FbpManifestModule>>}
+ */
+exports.list = (baseDir, options) => {
   const packageFile = path.resolve(baseDir, 'package.json');
   return readfile(packageFile, 'utf-8')
     .then((json) => {
       const packageData = JSON.parse(json);
       if (!packageData.msgflo) { return Promise.resolve([]); }
 
+      /**
+       * @type {import("../list").FbpManifestModule}
+       */
       const module = {
         name: packageData.name,
         description: packageData.description,
@@ -67,8 +75,12 @@ exports.list = (baseDir, options, callback) => {
       });
 
       return Promise.resolve([module]);
-    })
-    .nodeify(callback);
+    });
 };
 
-exports.listDependencies = (baseDir, options, callback) => callback(null, []);
+/**
+ * @param {string} baseDir
+ * @param {import("../list").FbpManifestOptions} options
+ * @returns {Promise<Array<string>>}
+ */
+exports.listDependencies = (baseDir, options) => Promise.resolve([]); // eslint-disable-line no-unused-vars,max-len

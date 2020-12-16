@@ -1,4 +1,5 @@
 /node_modules/
 /schema/
 /.nyc_output/
+/dist/
 package-lock.json
