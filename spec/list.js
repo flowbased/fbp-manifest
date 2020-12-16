@@ -23,12 +23,12 @@ describe('Listing components', () => {
     (err, modules) => {
       if (err) { return done(err); }
       chai.expect(modules.length).to.equal(3);
-      const [common] = Array.from(modules.filter(m => m.runtime === 'noflo'));
+      const [common] = Array.from(modules.filter((m) => m.runtime === 'noflo'));
       chai.expect(common).to.be.an('object');
       chai.expect(common.components[0].name).to.equal('Foo');
       chai.expect(common.components[0].tests).to.include('spec');
       chai.expect(common.components[0].tests).to.include('Foo.yaml');
-      const [nodejs] = Array.from(modules.filter(m => m.runtime === 'noflo-nodejs'));
+      const [nodejs] = Array.from(modules.filter((m) => m.runtime === 'noflo-nodejs'));
       chai.expect(nodejs).to.be.an('object');
       chai.expect(nodejs.components.length).to.equal(4);
       chai.expect(nodejs.components[0].name).to.equal('Bar');

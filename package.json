@@ -4,7 +4,7 @@
   "description": "Flow-Based Programming Manifest tools",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint src/*.js src/**/*.js src/**/**/*.js",
+    "lint": "eslint src/*.js src/**/*.js src/**/**/*.js spec/*.js",
     "typecheck": "tsc",
     "pretest": "npm run lint && npm run typecheck",
     "test": "nyc grunt test"
