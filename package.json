@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/flowbased/fbp-manifest#readme",
   "devDependencies": {
-    "@types/node": "^14.14.14",
+    "@types/node": "^16.11.7",
     "chai": "^4.0.1",
     "coveralls": "^3.0.0",
     "eslint": "^7.9.0",
